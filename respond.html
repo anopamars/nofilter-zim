@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Answer Honestly — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .q-transition {
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .image-roast-zone {
+      border: 2px dashed #2a2a2a;
+      border-radius: 8px;
+      padding: 2rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      background: #080808;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .image-roast-zone:hover { border-color: var(--red); }
+    .image-roast-zone.has-image {
+      border-color: var(--red);
+      border-style: solid;
+      padding: 0;
+      overflow: hidden;
+    }
+    .image-roast-zone img {
+      width: 100%;
+      max-height: 240px;
+      object-fit: cover;
+      display: block;
+      border-radius: 6px;
+    }
+    .image-roast-zone .upload-label {
+      color: #444;
+      font-size: 0.85rem;
+      line-height: 1.8;
+    }
+    .image-roast-zone .upload-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .image-remove {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0,0,0,0.7);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .image-roast-zone.has-image .image-remove { display: flex; }
+
+    .reaction-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+    .reaction-chip {
+      background: #111;
+      border: 0.5px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.82rem;
+      color: #777;
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .reaction-chip:hover { border-color: var(--red); color: var(--white); }
+    .reaction-chip.selected {
+      background: #1a0000;
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .q-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 0.75rem;
+    }
+    .q-type-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--red);
+    }
+
+    .done-screen {
+      text-align: center;
+      padding: 3rem 0;
+    }
+    .done-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .subject-photo {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--red);
+      margin-bottom: 1rem;
+    }
+    .subject-initials {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      color: white;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+    <div class="logo">no<span>filter</span> <span style="color:#555;font-size:0.9rem;">zim</span></div>
+    <div class="anon-badge">
+      <div class="anon-dot"></div>
+      100% anonymous
+    </div>
+  </div>
+
+  <!-- SUBJECT PROFILE -->
+  <div class="card" id="subject-card" style="margin-bottom:1.5rem;">
+    <div id="subject-avatar-wrap"></div>
+    <h2 id="subject-name">Loading...</h2>
+    <div class="muted" id="subject-meta" style="margin-bottom:0.75rem;"></div>
+    <div class="pills" id="subject-pills"></div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress" style="width:0%"></div>
+  </div>
+
+  <p class="muted" style="font-size:0.78rem;margin-bottom:1.5rem;text-align:right;" id="progress-label">
+    Question 1 of 6
+  </p>
+
+  <div id="question-area"></div>
+
+  <script src="app.js"></script>
+  <script>
+
+    const QUESTIONS = [
+      {
+        type: 'text',
+        q: "What is their biggest red flag that they pretend isn't there?",
+        placeholder: "Be honest, they can't see who said this...",
+        chips: ['Overconfident', 'Inconsistent', 'Delusional', 'Procrastinator', 'People pleaser']
+      },
+      {
+        type: 'image',
+        q: "Upload a photo of them and roast what you see.",
+        placeholder: "Describe what this photo says about their life choices...",
+        chips: ['The outfit says a lot', 'That background though', 'The energy is off', 'Trying too hard', 'Actually looks good']
+      },
+      {
+        type: 'text',
+        q: "Are they actually as good at what they do as they think they are?",
+        placeholder: "Give your real take...",
+        chips: ['Not even close', 'Decent but delusional', 'Actually pretty good', 'Mid at best', 'They need humility']
+      },
+      {
+        type: 'text',
+        q: "What do they need to hear that nobody ever tells them?",
+        placeholder: "Say the thing everyone is thinking...",
+        chips: ['Stop talking, start doing', 'Your circle is a problem', 'Be more consistent', 'Stop oversharing', 'Dress better']
+      },
+      {
+        type: 'text',
+        q: "Rate their life choices from 1–10 and explain why.",
+        placeholder: "1 = total disaster, 10 = they are absolutely winning...",
+        chips: ['3 — needs serious help', '5 — potential but wasted', '6 — doing okay', '7 — actually solid', '4 — almost there']
+      },
+      {
+        type: 'text',
+        q: "If you had to predict where they will be in 5 years, what is your honest take?",
+        placeholder: "Be real about it...",
+        chips: ['Same spot, different excuses', 'Actually winning', 'Glow up incoming', 'Depends on their choices', 'Hard to say']
+      }
+    ];
+
+    let currentQ = 0;
+    let answers = [];
+    let imageData = null;
+    let selectedChip = null;
+
+    const params = new URLSearchParams(window.location.search);
+    const isDemo = params.get('demo') === 'true';
+    const profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
+
+    const demoProfile = {
+      name: 'Chido',
+      age: '24',
+      job: 'Content Creator',
+      rel: 'Single and thriving',
+      good: 'storytelling',
+      flex: 'Just hit 10k followers',
+      photo: null
+    };
+
+    const subject = (isDemo || !profile.name) ? demoProfile : profile;
+
+    // Build subject card
+    const avatarWrap = document.getElementById('subject-avatar-wrap');
+    if (subject.photo) {
+      avatarWrap.innerHTML = `<img src="${subject.photo}" class="subject-photo" alt="${subject.name}">`;
+    } else {
+      avatarWrap.innerHTML = `<div class="subject-initials">${subject.name[0].toUpperCase()}</div>`;
+    }
+
+    document.getElementById('subject-name').textContent = subject.name;
+    document.getElementById('subject-meta').textContent = `${subject.age} yrs • ${subject.job}`;
+
+    const pillsEl = document.getElementById('subject-pills');
+    [subject.rel, subject.good ? 'Great at: ' + subject.good : null, subject.flex]
+      .filter(Boolean).forEach(p => {
+        const span = document.createElement('span');
+        span.className = 'pill';
+        span.textContent = p;
+        pillsEl.appendChild(span);
+      });
+
+    function renderQuestion() {
+      selectedChip = null;
+      imageData = null;
+
+      const pct = (currentQ / QUESTIONS.length) * 100;
+      document.getElementById('progress').style.width = pct + '%';
+      document.getElementById('progress-label').textContent = `Question ${currentQ + 1} of ${QUESTIONS.length}`;
+
+      if (currentQ >= QUESTIONS.length) {
+        localStorage.setItem('nfz_answers', JSON.stringify(answers));
+        document.getElementById('question-area').innerHTML = `
+          <div class="done-screen">
+            <span class="done-icon">✓</span>
+            <h2 style="margin-bottom:0.5rem;">Sent anonymously</h2>
+            <p style="margin-bottom:0.5rem;">${subject.name} gets notified when enough people respond.</p>
+            <p class="muted" style="font-size:0.82rem;margin-bottom:2rem;">They will never know it was you.</p>
+            <a href="index.html" class="btn-primary">Create my own profile →</a>
+            <a href="respond.html?demo=true" class="btn-ghost" style="margin-top:10px;">Roast someone else</a>
+          </div>`;
+        document.getElementById('progress').style.width = '100%';
+        return;
+      }
+
+      const q = QUESTIONS[currentQ];
+      const isLast = currentQ === QUESTIONS.length - 1;
+
+      let questionHTML = `
+        <div class="q-transition">
+          <div class="q-type-badge">
+            <div class="q-type-dot"></div>
+            ${q.type === 'image' ? 'Photo roast' : 'Written response'}
+          </div>
+          <div class="card">
+            <h3 style="margin-bottom:1rem;">${q.q}</h3>`;
+
+      if (q.type === 'image') {
+        questionHTML += `
+            <div class="image-roast-zone" id="image-zone" onclick="triggerImageUpload()">
+              <span class="upload-icon">📸</span>
+              <div class="upload-label">
+                Tap to upload a photo of ${subject.name}<br>
+                <span style="color:#333;font-size:0.75rem;">Optional — skip if you don't have one</span>
+              </div>
+              <img id="uploaded-img" src="" alt="" style="display:none;">
+              <button class="image-remove" id="remove-img" onclick="removeImage(event)">✕</button>
+            </div>
+            <input id="img-file-input" type="file" accept="image/*" style="display:none" onchange="handleImageUpload(event)">`;
+      }
+
+      if (q.chips && q.chips.length) {
+        questionHTML += `
+            <p class="muted" style="font-size:0.78rem;margin-bottom:0.6rem;">Quick pick or write your own:</p>
+            <div class="reaction-row" id="chip-row">
+              ${q.chips.map(c => `<div class="reaction-chip" onclick="selectChip(this, '${c}')">${c}</div>`).join('')}
+            </div>`;
+      }
+
+      questionHTML += `
+            <textarea
+              id="current-answer"
+              class="nf-input"
+              rows="3"
+              placeholder="${q.placeholder}"
+              style="resize:none;margin-top:0.5rem;"
+            ></textarea>
+            <div id="q-error" class="error-msg">Write something — even a few words counts.</div>
+          </div>
+          <button class="btn-primary" onclick="nextQuestion()">
+            ${isLast ? 'Submit anonymously →' : 'Next →'}
+          </button>
+          ${currentQ > 0 ? `<button class="btn-ghost" onclick="prevQuestion()">← Previous</button>` : ''}
+        </div>`;
+
+      document.getElementById('question-area').innerHTML = questionHTML;
+    }
+
+    function selectChip(el, value) {
+      document.querySelectorAll('.reaction-chip').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedChip = value;
+      const ta = document.getElementById('current-answer');
+      if (!ta.value.trim()) ta.value = value;
+    }
+
+    function triggerImageUpload() {
+      document.getElementById('img-file-input').click();
+    }
+
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imageData = e.target.result;
+        const zone = document.getElementById('image-zone');
+        const img = document.getElementById('uploaded-img');
+        zone.classList.add('has-image');
+        img.src = imageData;
+        img.style.display = 'block';
+        zone.querySelector('.upload-icon') && (zone.querySelector('.upload-icon').style.display = 'none');
+        zone.querySelector('.upload-label') && (zone.querySelector('.upload-label').style.display = 'none');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function removeImage(e) {
+      e.stopPropagation();
+      imageData = null;
+      const zone = document.getElementById('image-zone');
+      zone.classList.remove('has-image');
+      document.getElementById('uploaded-img').style.display = 'none';
+      document.getElementById('uploaded-img').src = '';
+      if (zone.querySelector('.upload-icon')) zone.querySelector('.upload-icon').style.display = 'block';
+      if (zone.querySelector('.upload-label')) zone.querySelector('.upload-label').style.display = 'block';
+    }
+
+    function nextQuestion() {
+      const ta = document.getElementById('current-answer');
+      const err = document.getElementById('q-error');
+      const q = QUESTIONS[currentQ];
+
+      // Image question — text is optional if image provided
+      if (q.type === 'image') {
+        const answer = ta ? ta.value.trim() : '';
+        answers[currentQ] = {
+          type: 'image',
+          text: answer || selectedChip || 'No comment provided',
+          image: imageData
+        };
+        currentQ++;
+        renderQuestion();
+        return;
+      }
+
+      if (!ta || (ta.value.trim().length < 2 && !selectedChip)) {
+        err.style.display = 'block';
+        ta.style.borderColor = 'var(--red)';
+        setTimeout(() => {
+          err.style.display = 'none';
+          ta.style.borderColor = '';
+        }, 2000);
+        return;
+      }
+
+      answers[currentQ] = {
+        type: 'text',
+        text: ta.value.trim() || selectedChip
+      };
+      currentQ++;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (currentQ > 0) {
+        currentQ--;
+        renderQuestion();
+      }
+    }
+
+    renderQuestion();
+  </script>
+
+</body>
+</html>

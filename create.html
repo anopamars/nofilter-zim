@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Profile — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .photo-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+    .photo-ring {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px dashed #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      overflow: hidden;
+      position: relative;
+      transition: border-color 0.2s;
+      background: #111;
+      margin-bottom: 1rem;
+    }
+    .photo-ring:hover { border-color: var(--red); }
+    .photo-ring img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+    .photo-placeholder {
+      text-align: center;
+      color: #444;
+      font-size: 0.78rem;
+      line-height: 1.5;
+    }
+    .photo-placeholder .icon {
+      font-size: 1.6rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .photo-btns {
+      display: flex;
+      gap: 10px;
+    }
+    .photo-btn {
+      background: #111;
+      border: 0.5px solid #333;
+      color: #aaa;
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .photo-btn:hover { border-color: var(--red); color: var(--white); }
+
+    /* Camera modal */
+    .camera-modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 100;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .camera-modal.open { display: flex; }
+    .camera-modal video {
+      width: 100%;
+      max-width: 340px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      margin-bottom: 1.5rem;
+    }
+    .camera-modal canvas { display: none; }
+    .camera-actions { display: flex; gap: 12px; width: 100%; max-width: 340px; }
+
+    .char-count {
+      font-size: 0.72rem;
+      color: #555;
+      text-align: right;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="nav-back">← back</a>
+
+  <div class="section-label">Step 1 of 2</div>
+  <h2>Set up your profile</h2>
+  <p style="margin-bottom:2rem;">Tell people enough to roast you properly.</p>
+
+  <!-- PHOTO UPLOAD -->
+  <div class="photo-section">
+    <div class="photo-ring" id="photo-ring" onclick="document.getElementById('file-input').click()">
+      <img id="photo-preview" src="" alt="preview">
+      <div class="photo-placeholder" id="photo-placeholder">
+        <span class="icon">+</span>
+        Add photo
+      </div>
+    </div>
+    <div class="photo-btns">
+      <button class="photo-btn" onclick="document.getElementById('file-input').click()">Upload photo</button>
+      <button class="photo-btn" onclick="openCamera()">Take selfie</button>
+    </div>
+    <input id="file-input" type="file" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Your name or nickname *</label>
+    <input id="inp-name" class="nf-input" type="text" placeholder="e.g. Taku, Chido, Simba..." maxlength="30" oninput="updateChar(this,'name-count')">
+    <div class="char-count"><span id="name-count">0</span>/30</div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Your age *</label>
+    <input id="inp-age" class="nf-input" type="number" placeholder="e.g. 23" min="13" max="99">
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">What you do *</label>
+    <input id="inp-job" class="nf-input" type="text" placeholder="e.g. student, designer, hustler..." maxlength="50" oninput="updateChar(this,'job-count')">
+    <div class="char-count"><span id="job-count">0</span>/50</div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Relationship status *</label>
+    <select id="inp-rel" class="nf-input">
+      <option value="">Select...</option>
+      <option>Single and thriving</option>
+      <option>In a relationship</option>
+      <option>It's complicated</option>
+      <option>Married</option>
+      <option>Situationship</option>
+      <option>Divorced</option>
+    </select>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">One thing you think you're great at</label>
+    <input id="inp-good" class="nf-input" type="text" placeholder="e.g. networking, cooking, reading people..." maxlength="60" oninput="updateChar(this,'good-count')">
+    <div class="char-count"><span id="good-count">0</span>/60</div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">One thing you're working on</label>
+    <input id="inp-working" class="nf-input" type="text" placeholder="e.g. being consistent, waking up early..." maxlength="60" oninput="updateChar(this,'working-count')">
+    <div class="char-count"><span id="working-count">0</span>/60</div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">Your biggest flex right now</label>
+    <input id="inp-flex" class="nf-input" type="text" placeholder="e.g. just got a new job, started a business..." maxlength="80" oninput="updateChar(this,'flex-count')">
+    <div class="char-count"><span id="flex-count">0</span>/80</div>
+  </div>
+
+  <div id="form-error" class="error-msg">Please fill in all required fields marked with *</div>
+
+  <div class="spacer"></div>
+  <button class="btn-primary" onclick="saveProfile()">Generate my link →</button>
+
+  <!-- CAMERA MODAL -->
+  <div class="camera-modal" id="camera-modal">
+    <div style="width:100%;max-width:340px;margin-bottom:1.5rem;">
+      <div class="section-label">Take your selfie</div>
+      <p class="muted">Position your face in the frame</p>
+    </div>
+    <video id="camera-video" autoplay playsinline></video>
+    <canvas id="camera-canvas"></canvas>
+    <div class="camera-actions">
+      <button class="btn-primary" style="flex:1;" onclick="capturePhoto()">Capture →</button>
+      <button class="btn-ghost" style="flex:1;margin-top:0;" onclick="closeCamera()">Cancel</button>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let photoData = null;
+    let stream = null;
+
+    function updateChar(input, countId) {
+      document.getElementById(countId).textContent = input.value.length;
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => setPhoto(e.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    function setPhoto(dataUrl) {
+      photoData = dataUrl;
+      const img = document.getElementById('photo-preview');
+      const placeholder = document.getElementById('photo-placeholder');
+      img.src = dataUrl;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      document.getElementById('photo-ring').style.borderColor = 'var(--red)';
+      document.getElementById('photo-ring').style.borderStyle = 'solid';
+    }
+
+    async function openCamera() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'user' }
+        });
+        document.getElementById('camera-video').srcObject = stream;
+        document.getElementById('camera-modal').classList.add('open');
+      } catch (e) {
+        alert('Camera not available. Please upload a photo instead.');
+      }
+    }
+
+    function capturePhoto() {
+      const video = document.getElementById('camera-video');
+      const canvas = document.getElementById('camera-canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      setPhoto(dataUrl);
+      closeCamera();
+    }
+
+    function closeCamera() {
+      if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+      }
+      document.getElementById('camera-modal').classList.remove('open');
+    }
+
+    function saveProfile() {
+      const name = document.getElementById('inp-name').value.trim();
+      const age = document.getElementById('inp-age').value.trim();
+      const job = document.getElementById('inp-job').value.trim();
+      const rel = document.getElementById('inp-rel').value;
+      const good = document.getElementById('inp-good').value.trim();
+      const working = document.getElementById('inp-working').value.trim();
+      const flex = document.getElementById('inp-flex').value.trim();
+      const err = document.getElementById('form-error');
+
+      if (!name || !age || !job || !rel) {
+        err.style.display = 'block';
+        return;
+      }
+
+      err.style.display = 'none';
+
+      const profile = { name, age, job, rel, good, working, flex, photo: photoData };
+      localStorage.setItem('nfz_profile', JSON.stringify(profile));
+      window.location.href = 'profile.html';
+    }
+  </script>
+
+</body>
+</html>

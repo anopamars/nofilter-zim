@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .photo-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--red);
+      margin-bottom: 1rem;
+    }
+    .initials-avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: white;
+      margin-bottom: 1rem;
+    }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .stat-box {
+      background: #111;
+      border: 0.5px solid #222;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-box .num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-box .label {
+      font-size: 0.72rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+    .activity-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid #1a1a1a;
+      font-size: 0.85rem;
+      color: #777;
+    }
+    .activity-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--red);
+      flex-shrink: 0;
+    }
+    .preview-btn {
+      background: #111;
+      border: 0.5px solid #222;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      transition: border-color 0.2s;
+      cursor: pointer;
+      width: 100%;
+    }
+    .preview-btn:hover { border-color: #444; }
+    .preview-btn-label { font-size: 0.82rem; color: #777; }
+    .preview-btn-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--white);
+      margin-top: 2px;
+    }
+    .preview-arrow { color: #444; font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="nav-back">← home</a>
+
+  <div class="section-label">Your profile is live</div>
+
+  <!-- PROFILE CARD -->
+  <div class="card" id="profile-card">
+    <div id="avatar-wrap"></div>
+    <h2 id="profile-name">Loading...</h2>
+    <div class="muted" id="profile-meta" style="margin-bottom:0.75rem;"></div>
+    <div class="pills" id="profile-pills"></div>
+  </div>
+
+  <!-- SHARE BOX -->
+  <div class="section-label" style="margin-top:1.5rem;">Your shareable link</div>
+  <div class="share-box">
+    <div class="share-url" id="share-url"></div>
+    <div style="display:flex;gap:10px;margin-top:10px;">
+      <button class="photo-btn" style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="copyLink()">Copy link</button>
+      <button class="photo-btn" style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="shareLink()">Share →</button>
+    </div>
+    <span id="copy-confirm" class="success-msg" style="display:none;margin-top:6px;display:none;">Copied to clipboard!</span>
+  </div>
+
+  <!-- CAPTION -->
+  <div class="card" style="border-color:#1a1a1a;">
+    <div class="section-label">Caption to post</div>
+    <p style="font-style:italic;font-size:0.9rem;color:#aaa;line-height:1.7;">
+      "Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. I can take it. Link in bio."
+    </p>
+    <button onclick="copyCaption()" style="background:none;border:none;color:#555;font-size:0.78rem;cursor:pointer;margin-top:8px;padding:0;font-family:'DM Sans',sans-serif;">Copy caption</button>
+    <span id="caption-confirm" class="success-msg" style="display:none;">Copied!</span>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-grid">
+    <div class="stat-box">
+      <div class="num" id="response-count">0</div>
+      <div class="label">Responses</div>
+    </div>
+    <div class="stat-box">
+      <div class="num" id="views-count">0</div>
+      <div class="label">Profile views</div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY FEED -->
+  <div class="card" style="border-color:#1a1a1a;">
+    <div class="section-label">Activity</div>
+    <div id="activity-feed">
+      <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">No activity yet. Share your link to get responses.</div>
+    </div>
+  </div>
+
+  <!-- QUICK LINKS -->
+  <div class="section-label" style="margin-top:1.5rem;">Pages</div>
+  <a href="respond.html" class="preview-btn">
+    <div>
+      <div class="preview-btn-label">What your followers see</div>
+      <div class="preview-btn-title">Respond page →</div>
+    </div>
+    <div class="preview-arrow">›</div>
+  </a>
+
+  <!-- GENERATE -->
+  <div style="margin-top:1.5rem;">
+    <button class="btn-primary" id="generate-btn" onclick="goGenerate()" disabled style="opacity:0.4;">
+      Generate my roast + villain arc →
+    </button>
+    <p style="text-align:center;font-size:0.78rem;color:#555;margin-top:8px;">
+      Need at least 3 responses to generate
+    </p>
+  </div>
+
+  <div class="spacer"></div>
+  <button class="btn-ghost" onclick="simulateResponses()">Simulate responses (demo)</button>
+  <button class="btn-ghost" style="margin-top:8px;color:#333;border-color:#1a1a1a;" onclick="resetProfile()">Reset profile</button>
+
+  <script src="app.js"></script>
+  <script>
+    let responseCount = 0;
+
+    const profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
+    if (!profile.name) window.location.href = 'create.html';
+
+    // Avatar
+    const avatarWrap = document.getElementById('avatar-wrap');
+    if (profile.photo) {
+      avatarWrap.innerHTML = `<img src="${profile.photo}" class="photo-avatar" alt="${profile.name}">`;
+    } else {
+      avatarWrap.innerHTML = `<div class="initials-avatar">${profile.name[0].toUpperCase()}</div>`;
+    }
+
+    document.getElementById('profile-name').textContent = profile.name;
+    document.getElementById('profile-meta').textContent = `${profile.age} yrs • ${profile.job}`;
+
+    const handle = profile.name.toLowerCase().replace(/\s+/g, '');
+    document.getElementById('share-url').textContent = `nofilter.zim/u/${handle}`;
+
+    const pillsEl = document.getElementById('profile-pills');
+    [profile.rel, profile.good ? 'Great at: ' + profile.good : null, profile.flex].filter(Boolean).forEach(p => {
+      const span = document.createElement('span');
+      span.className = 'pill';
+      span.textContent = p;
+      pillsEl.appendChild(span);
+    });
+
+    // Fake views counter
+    let views = parseInt(localStorage.getItem('nfz_views') || '0');
+    views += Math.floor(Math.random() * 8) + 1;
+    localStorage.setItem('nfz_views', views);
+    document.getElementById('views-count').textContent = views;
+
+    responseCount = parseInt(localStorage.getItem('nfz_response_count') || '0');
+    document.getElementById('response-count').textContent = responseCount;
+    updateBtn();
+
+    function copyLink() {
+      navigator.clipboard.writeText(`nofilter.zim/u/${handle}`);
+      const el = document.getElementById('copy-confirm');
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2000);
+    }
+
+    function shareLink() {
+      const text = `Tell me what you REALLY think of me 😈 Be anonymous. Be brutal.\n\nnofilter.zim/u/${handle}`;
+      if (navigator.share) {
+        navigator.share({ title: 'No Filter Zim', text });
+      } else {
+        copyLink();
+      }
+    }
+
+    function copyCaption() {
+      navigator.clipboard.writeText(`Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. I can take it. Link in bio.`);
+      const el = document.getElementById('caption-confirm');
+      el.style.display = 'inline';
+      setTimeout(() => el.style.display = 'none', 2000);
+    }
+
+    function simulateResponses() {
+      responseCount = Math.floor(Math.random() * 6) + 4;
+      localStorage.setItem('nfz_response_count', responseCount);
+      document.getElementById('response-count').textContent = responseCount;
+
+      const feed = document.getElementById('activity-feed');
+      const times = ['2 min ago', '8 min ago', '15 min ago', '31 min ago', '1 hr ago'];
+      feed.innerHTML = '';
+      for (let i = 0; i < Math.min(responseCount, 5); i++) {
+        feed.innerHTML += `
+          <div class="activity-item">
+            <div class="activity-dot"></div>
+            <span>Someone answered your questions <span style="color:#444;">${times[i]}</span></span>
+          </div>`;
+      }
+      updateBtn();
+    }
+
+    function updateBtn() {
+      const btn = document.getElementById('generate-btn');
+      if (responseCount >= 3) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+      }
+    }
+
+    function goGenerate() {
+      window.location.href = 'roast.html';
+    }
+
+    function resetProfile() {
+      if (confirm('This will delete your profile and all responses. Are you sure?')) {
+        clearData();
+        window.location.href = 'index.html';
+      }
+    }
+  </script>
+
+</body>
+</html>
