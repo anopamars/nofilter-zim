@@ -83,7 +83,12 @@
       margin-bottom: 1.5rem;
     }
     .camera-modal canvas { display: none; }
-    .camera-actions { display: flex; gap: 12px; width: 100%; max-width: 340px; }
+    .camera-actions {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 340px;
+    }
 
     .char-count {
       font-size: 0.72rem;
@@ -91,17 +96,54 @@
       text-align: right;
       margin-top: 4px;
     }
+
+    .step-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 2rem;
+    }
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #222;
+    }
+    .step-dot.active { background: var(--red); }
+    .step-dot.done { background: #444; }
+
+    .form-section-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      margin-top: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 0.5px solid #1a1a1a;
+    }
   </style>
 </head>
 <body>
 
   <a href="index.html" class="nav-back">← back</a>
 
+  <div class="step-indicator">
+    <div class="step-dot active"></div>
+    <div class="step-dot"></div>
+    <div class="step-dot"></div>
+  </div>
+
   <div class="section-label">Step 1 of 2</div>
   <h2>Set up your profile</h2>
-  <p style="margin-bottom:2rem;">Tell people enough to roast you properly.</p>
+  <p style="margin-bottom:2rem;color:#666;">
+    Tell people enough to roast you properly.
+    The more honest you are, the better the roast.
+  </p>
 
-  <!-- PHOTO UPLOAD -->
+  <!-- PHOTO -->
   <div class="photo-section">
     <div class="photo-ring" id="photo-ring" onclick="document.getElementById('file-input').click()">
       <img id="photo-preview" src="" alt="preview">
@@ -111,26 +153,43 @@
       </div>
     </div>
     <div class="photo-btns">
-      <button class="photo-btn" onclick="document.getElementById('file-input').click()">Upload photo</button>
-      <button class="photo-btn" onclick="openCamera()">Take selfie</button>
+      <button class="photo-btn" onclick="document.getElementById('file-input').click()">
+        📁 Upload photo
+      </button>
+      <button class="photo-btn" onclick="openCamera()">
+        📸 Take selfie
+      </button>
     </div>
     <input id="file-input" type="file" accept="image/*" style="display:none" onchange="handleFileUpload(event)">
+    <p style="font-size:0.75rem;color:#333;margin-top:8px;text-align:center;">
+      Optional but makes your profile more roastable
+    </p>
   </div>
+
+  <!-- BASIC INFO -->
+  <div class="form-section-title">Basic info</div>
 
   <div class="input-group">
     <label class="input-label">Your name or nickname *</label>
-    <input id="inp-name" class="nf-input" type="text" placeholder="e.g. Taku, Chido, Simba..." maxlength="30" oninput="updateChar(this,'name-count')">
+    <input id="inp-name" class="nf-input" type="text"
+      placeholder="e.g. Taku, Chido, Simba..."
+      maxlength="30"
+      oninput="updateChar(this,'name-count')">
     <div class="char-count"><span id="name-count">0</span>/30</div>
   </div>
 
   <div class="input-group">
     <label class="input-label">Your age *</label>
-    <input id="inp-age" class="nf-input" type="number" placeholder="e.g. 23" min="13" max="99">
+    <input id="inp-age" class="nf-input" type="number"
+      placeholder="e.g. 23" min="13" max="99">
   </div>
 
   <div class="input-group">
     <label class="input-label">What you do *</label>
-    <input id="inp-job" class="nf-input" type="text" placeholder="e.g. student, designer, hustler..." maxlength="50" oninput="updateChar(this,'job-count')">
+    <input id="inp-job" class="nf-input" type="text"
+      placeholder="e.g. student, designer, hustler..."
+      maxlength="50"
+      oninput="updateChar(this,'job-count')">
     <div class="char-count"><span id="job-count">0</span>/50</div>
   </div>
 
@@ -147,28 +206,71 @@
     </select>
   </div>
 
+  <!-- ROAST FUEL -->
+  <div class="form-section-title">Roast fuel</div>
+  <p style="color:#555;font-size:0.82rem;margin-bottom:1.25rem;line-height:1.6;">
+    This is what people will roast you on. Be honest — the more specific, the better the roast.
+  </p>
+
   <div class="input-group">
     <label class="input-label">One thing you think you're great at</label>
-    <input id="inp-good" class="nf-input" type="text" placeholder="e.g. networking, cooking, reading people..." maxlength="60" oninput="updateChar(this,'good-count')">
+    <input id="inp-good" class="nf-input" type="text"
+      placeholder="e.g. networking, cooking, reading people..."
+      maxlength="60"
+      oninput="updateChar(this,'good-count')">
     <div class="char-count"><span id="good-count">0</span>/60</div>
   </div>
 
   <div class="input-group">
     <label class="input-label">One thing you're working on</label>
-    <input id="inp-working" class="nf-input" type="text" placeholder="e.g. being consistent, waking up early..." maxlength="60" oninput="updateChar(this,'working-count')">
+    <input id="inp-working" class="nf-input" type="text"
+      placeholder="e.g. being consistent, waking up early..."
+      maxlength="60"
+      oninput="updateChar(this,'working-count')">
     <div class="char-count"><span id="working-count">0</span>/60</div>
   </div>
 
   <div class="input-group">
     <label class="input-label">Your biggest flex right now</label>
-    <input id="inp-flex" class="nf-input" type="text" placeholder="e.g. just got a new job, started a business..." maxlength="80" oninput="updateChar(this,'flex-count')">
+    <input id="inp-flex" class="nf-input" type="text"
+      placeholder="e.g. just got a new job, started a business..."
+      maxlength="80"
+      oninput="updateChar(this,'flex-count')">
     <div class="char-count"><span id="flex-count">0</span>/80</div>
   </div>
 
-  <div id="form-error" class="error-msg">Please fill in all required fields marked with *</div>
+  <div class="input-group">
+    <label class="input-label">Your biggest insecurity (optional but 🔥)</label>
+    <input id="inp-insecurity" class="nf-input" type="text"
+      placeholder="e.g. I talk too much, I overthink everything..."
+      maxlength="80"
+      oninput="updateChar(this,'insecurity-count')">
+    <div class="char-count"><span id="insecurity-count">0</span>/80</div>
+  </div>
+
+  <div class="input-group">
+    <label class="input-label">One goal you keep saying you'll start</label>
+    <input id="inp-goal" class="nf-input" type="text"
+      placeholder="e.g. go to the gym, start my business, read more..."
+      maxlength="80"
+      oninput="updateChar(this,'goal-count')">
+    <div class="char-count"><span id="goal-count">0</span>/80</div>
+  </div>
+
+  <div id="form-error" class="error-msg">
+    Please fill in all required fields marked with *
+  </div>
 
   <div class="spacer"></div>
-  <button class="btn-primary" onclick="saveProfile()">Generate my link →</button>
+
+  <button class="btn-primary" onclick="saveProfile()">
+    Generate my link →
+  </button>
+
+  <p style="text-align:center;font-size:0.75rem;color:#333;margin-top:1rem;line-height:1.6;">
+    Your profile is only shared when you share your link.<br>
+    Responses are always 100% anonymous.
+  </p>
 
   <!-- CAMERA MODAL -->
   <div class="camera-modal" id="camera-modal">
@@ -251,16 +353,31 @@
       const good = document.getElementById('inp-good').value.trim();
       const working = document.getElementById('inp-working').value.trim();
       const flex = document.getElementById('inp-flex').value.trim();
+      const insecurity = document.getElementById('inp-insecurity').value.trim();
+      const goal = document.getElementById('inp-goal').value.trim();
       const err = document.getElementById('form-error');
 
       if (!name || !age || !job || !rel) {
         err.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       err.style.display = 'none';
 
-      const profile = { name, age, job, rel, good, working, flex, photo: photoData };
+      // Clear any old data from previous profile
+      localStorage.removeItem('nfz_expires_at');
+      localStorage.removeItem('nfz_response_count');
+      localStorage.removeItem('nfz_answers');
+      localStorage.removeItem('nfz_views');
+
+      const profile = {
+        name, age, job, rel,
+        good, working, flex,
+        insecurity, goal,
+        photo: photoData
+      };
+
       localStorage.setItem('nfz_profile', JSON.stringify(profile));
       window.location.href = 'profile.html';
     }
