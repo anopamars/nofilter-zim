@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Roast — No Filter Zim</title>
   <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
   <style>
     /* COUNTDOWN */
     .countdown-screen {
@@ -66,21 +67,14 @@
       gap: 10px;
       margin-bottom: 1.25rem;
     }
-    .mood-emoji {
-      font-size: 2rem;
-      line-height: 1;
-    }
+    .mood-emoji { font-size: 2rem; line-height: 1; }
     .mood-title {
       font-family: 'Syne', sans-serif;
       font-weight: 700;
       font-size: 1.1rem;
       color: var(--white);
     }
-    .mood-genre {
-      font-size: 0.78rem;
-      color: #666;
-      margin-top: 2px;
-    }
+    .mood-genre { font-size: 0.78rem; color: #666; margin-top: 2px; }
     .song-item {
       display: flex;
       align-items: center;
@@ -97,16 +91,8 @@
       min-width: 20px;
     }
     .song-info { flex: 1; }
-    .song-title {
-      font-size: 0.9rem;
-      color: var(--white);
-      font-weight: 500;
-    }
-    .song-artist {
-      font-size: 0.78rem;
-      color: #555;
-      margin-top: 2px;
-    }
+    .song-title { font-size: 0.9rem; color: var(--white); font-weight: 500; }
+    .song-artist { font-size: 0.78rem; color: #555; margin-top: 2px; }
     .song-vibe {
       font-size: 0.72rem;
       color: var(--purple);
@@ -115,7 +101,7 @@
       padding: 3px 10px;
     }
 
-    /* VILLAIN MISSION */
+    /* VILLAIN */
     .mission-header {
       display: flex;
       align-items: center;
@@ -134,7 +120,7 @@
       border-radius: 20px;
     }
 
-    /* SHARE CARD */
+    /* SHARE */
     .share-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -159,13 +145,13 @@
 </head>
 <body>
 
-  <!-- COUNTDOWN SCREEN -->
+  <!-- COUNTDOWN -->
   <div class="countdown-screen" id="countdown-screen">
     <div class="countdown-num" id="countdown-num">3</div>
     <div class="countdown-label" id="countdown-label">get ready</div>
   </div>
 
-  <!-- LOADING SCREEN -->
+  <!-- LOADING -->
   <div id="loading-screen" style="display:none;">
     <div class="loading" style="padding-top:4rem;">
       <div class="section-label">Cooking something brutal</div>
@@ -199,13 +185,13 @@
       </div>
     </div>
 
-    <!-- ROAST CARD -->
+    <!-- ROAST -->
     <div class="roast-card">
       <div class="section-label">🔥 the roast</div>
       <p id="roast-content" style="color:#ddd;line-height:1.9;font-size:0.95rem;"></p>
     </div>
 
-    <!-- REAL TALK -->
+    <!-- ADVICE -->
     <div class="advice-card">
       <div class="section-label" style="color:#4a9;">💡 real talk</div>
       <p id="advice-content" style="color:#aaa;line-height:1.8;font-size:0.92rem;"></p>
@@ -218,7 +204,7 @@
         <div class="mission-badge">30-day mission</div>
       </div>
       <p style="color:#aaa;font-size:0.85rem;margin-bottom:1.25rem;line-height:1.6;">
-        You've been roasted. Now flip the script. Execute all 3 missions.
+        You have been roasted. Now flip the script. Execute all 3 missions.
       </p>
       <div id="villain-steps"></div>
     </div>
@@ -264,7 +250,6 @@
     </div>
 
     <div class="spacer"></div>
-
   </div>
 
   <script src="app.js"></script>
@@ -302,7 +287,6 @@
         numEl.className = 'countdown-num ' + steps[i].cls;
         numEl.textContent = steps[i].num;
         labelEl.textContent = steps[i].label;
-        // re-trigger animation
         numEl.style.animation = 'none';
         numEl.offsetHeight;
         numEl.style.animation = '';
@@ -352,8 +336,11 @@
       startLoadingMessages();
 
       const answersText = answers.length > 0
-        ? answers.map((a, i) => `Response ${i + 1}: "${a}"`).join('\n')
-        : `People said ${profile.name} is inconsistent, overconfident about their ${profile.good || 'skills'}, and their ${profile.rel} situation raises questions. They think ${profile.name} talks more than they deliver.`;
+        ? answers.map((a, i) => {
+            if (a.type === 'image') return `Response ${i + 1} (photo roast): "${a.text}"`;
+            return `Response ${i + 1}: "${a.text}"`;
+          }).join('\n')
+        : `People said ${profile.name} is inconsistent, overconfident about their ${profile.good || 'skills'}, and their ${profile.rel} situation raises questions.`;
 
       const prompt = `You are a brutally honest but ultimately caring roast generator for No Filter Zim, a Zimbabwean social app.
 
@@ -369,21 +356,17 @@ The person being roasted:
 Anonymous responses from people who know them:
 ${answersText}
 
-Generate FOUR sections. Be sharp, specific, culturally relevant to Zimbabwe, and entertaining.
+Generate FOUR sections. Be sharp, specific, culturally relevant to Zimbabwe, and entertaining. Use Zim slang and references naturally.
 
 ROAST: 3-4 sentences. Funny, direct, personal. Call out contradictions. No generic lines.
 
-ADVICE: 3-4 sentences of genuinely useful direct advice based on the roast.
+ADVICE: 3-4 sentences of genuinely useful direct advice based on the roast. No fluff.
 
-VILLAIN_ARC: Exactly 3 mission steps for a 30-day reputation flip. Each step:
-- Short punchy TITLE (max 5 words)
-- Specific ACTION (2 concrete sentences)
+VILLAIN_ARC: Exactly 3 mission steps for a 30-day reputation flip.
+Each step needs a short punchy TITLE (max 5 words) and specific ACTION (2 concrete sentences).
 
-PLAYLIST: A playlist that matches the energy of this roast. Include:
-- MOOD: one word mood (e.g. Chaotic, Delusional, Unbothered, Ascending)
-- EMOJI: one emoji that fits the mood
-- GENRE: music genre + vibe description (1 sentence)
-- 5 songs with TITLE, ARTIST, and a short VIBE note (why this song fits them)
+PLAYLIST: A playlist matching the energy of this roast.
+Include MOOD (one word), EMOJI (one emoji), GENRE (1 sentence), and 5 songs each with TITLE, ARTIST, and VIBE note.
 
 Format EXACTLY like this:
 ROAST: [text]
@@ -398,7 +381,7 @@ STEP3_ACTION: [action]
 PLAYLIST:
 MOOD: [mood]
 EMOJI: [emoji]
-GENRE: [genre description]
+GENRE: [genre]
 SONG1_TITLE: [title]
 SONG1_ARTIST: [artist]
 SONG1_VIBE: [vibe]
@@ -416,21 +399,27 @@ SONG5_ARTIST: [artist]
 SONG5_VIBE: [vibe]`;
 
       try {
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
+        const res = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${CONFIG.OPENAI_API_KEY}`
+          },
           body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
+            model: 'gpt-4o-mini',
             max_tokens: 1500,
-            messages: [{ role: 'user', content: prompt }]
+            messages: [
+              { role: 'system', content: 'You are a brutally honest roast generator for a Zimbabwean social app. Be culturally relevant, funny, and sharp.' },
+              { role: 'user', content: prompt }
+            ]
           })
         });
 
         const data = await res.json();
         clearInterval(msgInterval);
-        const text = data.content?.[0]?.text || '';
+        const text = data.choices?.[0]?.message?.content || '';
 
-        // Parse
+        // Parse sections
         const roastMatch = text.match(/ROAST:\s*([\s\S]*?)(?=ADVICE:)/i);
         const adviceMatch = text.match(/ADVICE:\s*([\s\S]*?)(?=VILLAIN_ARC:)/i);
         const s1t = text.match(/STEP1_TITLE:\s*(.+)/i);
@@ -452,14 +441,17 @@ SONG5_VIBE: [vibe]`;
           { title: s3t?.[1]?.trim(), action: s3a?.[1]?.trim() }
         ];
 
-        // Parse songs
         const songs = [];
         for (let i = 1; i <= 5; i++) {
           const st = text.match(new RegExp(`SONG${i}_TITLE:\\s*(.+)`, 'i'));
           const sa = text.match(new RegExp(`SONG${i}_ARTIST:\\s*(.+)`, 'i'));
           const sv = text.match(new RegExp(`SONG${i}_VIBE:\\s*(.+)`, 'i'));
           if (st && sa) {
-            songs.push({ title: st[1].trim(), artist: sa[1].trim(), vibe: sv?.[1]?.trim() || '' });
+            songs.push({
+              title: st[1].trim(),
+              artist: sa[1].trim(),
+              vibe: sv?.[1]?.trim() || ''
+            });
           }
         }
 
@@ -474,21 +466,21 @@ SONG5_VIBE: [vibe]`;
 
       } catch (e) {
         clearInterval(msgInterval);
-        roastText = `${profile.name}, even the AI couldn't roast you today — but your wifi situation definitely needs roasting.`;
+        roastText = `${profile.name}, even the AI could not roast you today — but your wifi situation definitely needs roasting. Try again.`;
         adviceText = 'Fix your connection. Then come back and face the music.';
         villainSteps = [
           { title: 'Fix your wifi first', action: 'The villain arc starts with a stable connection. Come back when you are ready.' },
           { title: 'Try again tomorrow', action: 'Great villains are persistent. Do not give up after one technical failure.' },
-          { title: 'Tell no one about this', action: 'This moment stays between you and the error message. Nobody needs to know.' }
+          { title: 'Tell no one about this', action: 'This moment stays between you and the error message.' }
         ];
         playlistData = {
           mood: 'Disconnected',
           emoji: '📡',
           genre: 'Lo-fi beats for when the wifi is down',
           songs: [
-            { title: 'No Signal', artist: 'The Algorithm', vibe: 'Mirrors your current situation' },
+            { title: 'No Signal', artist: 'The Algorithm', vibe: 'Mirrors your situation' },
             { title: 'Try Again', artist: 'Aaliyah', vibe: 'Because you will' },
-            { title: 'Connection Lost', artist: 'Unknown Artist', vibe: 'Relatable right now' }
+            { title: 'Connection Lost', artist: 'Unknown Artist', vibe: 'Too relatable' }
           ]
         };
         await showResults();
@@ -496,7 +488,6 @@ SONG5_VIBE: [vibe]`;
     }
 
     async function showResults() {
-      // Populate profile snapshot
       document.getElementById('roast-title').textContent = `${profile.name}'s roast`;
       document.getElementById('response-count-display').textContent = responseCount;
 
@@ -509,20 +500,13 @@ SONG5_VIBE: [vibe]`;
       document.getElementById('snap-name').textContent = profile.name;
       document.getElementById('snap-meta').textContent = `${profile.age} yrs • ${profile.job} • ${profile.rel}`;
 
-      // Hide loading, show results
       document.getElementById('loading-screen').style.display = 'none';
       document.getElementById('results-screen').style.display = 'block';
-      document.getElementById('results-screen').classList.add('results-wrap');
-      document.getElementById('results-screen').style.display = 'block';
 
-      // Typewrite roast
       await typewrite(document.getElementById('roast-content'), roastText, 16);
 
-      // Fade in advice
-      const adviceEl = document.getElementById('advice-content');
-      adviceEl.textContent = adviceText;
+      document.getElementById('advice-content').textContent = adviceText;
 
-      // Build villain steps
       const villainEl = document.getElementById('villain-steps');
       villainEl.innerHTML = '';
       villainSteps.forEach((step, i) => {
@@ -546,7 +530,6 @@ SONG5_VIBE: [vibe]`;
         }
       });
 
-      // Build playlist
       if (playlistData) {
         document.getElementById('mood-emoji').textContent = playlistData.emoji;
         document.getElementById('mood-title').textContent = playlistData.mood + ' Energy';
@@ -570,14 +553,14 @@ SONG5_VIBE: [vibe]`;
 
     function shareRoast() {
       const short = roastText.length > 120 ? roastText.slice(0, 120) + '...' : roastText;
-      const text = `My anonymous roast just dropped 💀\n\n"${short}"\n\nGet yours → nofilter.zim`;
+      const text = `My anonymous roast just dropped 💀\n\n"${short}"\n\nGet yours → nofilterzim.netlify.app`;
       navigator.share ? navigator.share({ text }) : (navigator.clipboard.writeText(text), alert('Copied! Post it.'));
     }
 
     function shareVillainArc() {
       let text = `My 30-day Villain Arc ⚡\n\n`;
       villainSteps.forEach((s, i) => { if (s.title) text += `0${i + 1}. ${s.title}\n`; });
-      text += `\nGet roasted → nofilter.zim`;
+      text += `\nGet roasted → nofilterzim.netlify.app`;
       navigator.share ? navigator.share({ text }) : (navigator.clipboard.writeText(text), alert('Copied!'));
     }
 
@@ -585,7 +568,7 @@ SONG5_VIBE: [vibe]`;
       if (!playlistData) return;
       let text = `My roast playlist 🎵 ${playlistData.emoji}\n\nMood: ${playlistData.mood}\n\n`;
       playlistData.songs.forEach((s, i) => { text += `${i + 1}. ${s.title} — ${s.artist}\n`; });
-      text += `\nGet yours → nofilter.zim`;
+      text += `\nGet yours → nofilterzim.netlify.app`;
       navigator.share ? navigator.share({ text }) : (navigator.clipboard.writeText(text), alert('Copied!'));
     }
 
@@ -594,11 +577,10 @@ SONG5_VIBE: [vibe]`;
       let text = `I just got roasted on No Filter Zim 💀\n\n"${short}"\n\n⚡ My villain arc:\n`;
       villainSteps.forEach((s, i) => { if (s.title) text += `0${i + 1}. ${s.title}\n`; });
       if (playlistData) text += `\n🎵 My mood: ${playlistData.mood} ${playlistData.emoji}`;
-      text += `\n\nGet roasted → nofilter.zim`;
+      text += `\n\nGet roasted → nofilterzim.netlify.app`;
       navigator.share ? navigator.share({ text }) : (navigator.clipboard.writeText(text), alert('Copied! Post everything.'));
     }
 
-    // Start the experience
     runCountdown();
   </script>
 
