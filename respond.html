@@ -51,14 +51,12 @@
     }
     .image-remove {
       position: absolute;
-      top: 8px;
-      right: 8px;
+      top: 8px; right: 8px;
       background: rgba(0,0,0,0.7);
       border: none;
       color: white;
       border-radius: 50%;
-      width: 28px;
-      height: 28px;
+      width: 28px; height: 28px;
       cursor: pointer;
       font-size: 0.9rem;
       display: none;
@@ -100,34 +98,52 @@
       color: #555;
       margin-bottom: 0.75rem;
     }
-    .q-type-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: var(--red);
+    .q-type-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+
+    /* URGENCY BANNER */
+    .urgency-banner {
+      background: #0a0000;
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+    .urgency-left { font-size: 0.82rem; color: #aaa; }
+    .urgency-timer {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--red);
+    }
+    .urgency-timer.critical { animation: urgentPulse 1s infinite; }
+    @keyframes urgentPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
     }
 
-    .done-screen {
+    /* EXPIRED SCREEN */
+    .expired-screen {
       text-align: center;
       padding: 3rem 0;
     }
-    .done-icon {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      display: block;
-    }
+    .expired-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+
+    /* DONE SCREEN */
+    .done-screen { text-align: center; padding: 3rem 0; }
+    .done-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
 
     .subject-photo {
-      width: 56px;
-      height: 56px;
+      width: 56px; height: 56px;
       border-radius: 50%;
       object-fit: cover;
       border: 2px solid var(--red);
       margin-bottom: 1rem;
     }
     .subject-initials {
-      width: 56px;
-      height: 56px;
+      width: 56px; height: 56px;
       border-radius: 50%;
       background: var(--red);
       display: flex;
@@ -151,6 +167,12 @@
     </div>
   </div>
 
+  <!-- URGENCY BANNER -->
+  <div class="urgency-banner" id="urgency-banner" style="display:none;">
+    <div class="urgency-left">⏱️ Link closes in</div>
+    <div class="urgency-timer" id="urgency-timer">--:--:--</div>
+  </div>
+
   <!-- SUBJECT PROFILE -->
   <div class="card" id="subject-card" style="margin-bottom:1.5rem;">
     <div id="subject-avatar-wrap"></div>
@@ -162,7 +184,6 @@
   <div class="progress-bar">
     <div class="progress-fill" id="progress" style="width:0%"></div>
   </div>
-
   <p class="muted" style="font-size:0.78rem;margin-bottom:1.5rem;text-align:right;" id="progress-label">
     Question 1 of 6
   </p>
@@ -171,7 +192,6 @@
 
   <script src="app.js"></script>
   <script>
-
     const QUESTIONS = [
       {
         type: 'text',
@@ -215,6 +235,7 @@
     let answers = [];
     let imageData = null;
     let selectedChip = null;
+    let urgencyInterval = null;
 
     const params = new URLSearchParams(window.location.search);
     const isDemo = params.get('demo') === 'true';
@@ -232,6 +253,11 @@
 
     const subject = (isDemo || !profile.name) ? demoProfile : profile;
 
+    // Check if link is expired — only for real profiles not demo
+    const expiresAt = localStorage.getItem('nfz_expires_at');
+    const isExpired = !isDemo && expiresAt && Date.now() >= parseInt(expiresAt);
+    const isNotActivated = !isDemo && !expiresAt;
+
     // Build subject card
     const avatarWrap = document.getElementById('subject-avatar-wrap');
     if (subject.photo) {
@@ -239,7 +265,6 @@
     } else {
       avatarWrap.innerHTML = `<div class="subject-initials">${subject.name[0].toUpperCase()}</div>`;
     }
-
     document.getElementById('subject-name').textContent = subject.name;
     document.getElementById('subject-meta').textContent = `${subject.age} yrs • ${subject.job}`;
 
@@ -252,6 +277,66 @@
         pillsEl.appendChild(span);
       });
 
+    // Show urgency banner if active
+    if (!isDemo && expiresAt && !isExpired) {
+      document.getElementById('urgency-banner').style.display = 'flex';
+      updateUrgencyTimer();
+      urgencyInterval = setInterval(updateUrgencyTimer, 1000);
+    }
+
+    function updateUrgencyTimer() {
+      const expires = parseInt(localStorage.getItem('nfz_expires_at'));
+      const remaining = expires - Date.now();
+      if (remaining <= 0) {
+        clearInterval(urgencyInterval);
+        renderExpired();
+        return;
+      }
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+      const timerEl = document.getElementById('urgency-timer');
+      timerEl.textContent = `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      timerEl.className = 'urgency-timer' + (hours < 2 ? ' critical' : '');
+    }
+
+    function renderExpired() {
+      document.getElementById('urgency-banner').style.display = 'none';
+      document.getElementById('subject-card').style.display = 'none';
+      document.querySelector('.progress-bar').style.display = 'none';
+      document.getElementById('progress-label').style.display = 'none';
+      document.getElementById('question-area').innerHTML = `
+        <div class="expired-screen">
+          <span class="expired-icon">⌛</span>
+          <h2 style="margin-bottom:0.5rem;">This link has closed</h2>
+          <p class="muted" style="margin-bottom:0.5rem;">
+            ${subject.name}'s roast window has ended.
+          </p>
+          <p class="muted" style="font-size:0.82rem;margin-bottom:2rem;">
+            They collected responses and are generating their roast right now.
+          </p>
+          <a href="index.html" class="btn-primary">Create my own profile →</a>
+        </div>`;
+    }
+
+    // Show expired or not activated
+    if (isExpired) {
+      renderExpired();
+    } else if (isNotActivated) {
+      document.getElementById('question-area').innerHTML = `
+        <div class="expired-screen">
+          <span class="expired-icon">🔒</span>
+          <h2 style="margin-bottom:0.5rem;">Link not active yet</h2>
+          <p class="muted" style="margin-bottom:2rem;">
+            ${subject.name} hasn't activated their roast window yet.
+            Check back later or create your own profile.
+          </p>
+          <a href="index.html" class="btn-primary">Create my own profile →</a>
+        </div>`;
+    } else {
+      renderQuestion();
+    }
+
     function renderQuestion() {
       selectedChip = null;
       imageData = null;
@@ -261,7 +346,9 @@
       document.getElementById('progress-label').textContent = `Question ${currentQ + 1} of ${QUESTIONS.length}`;
 
       if (currentQ >= QUESTIONS.length) {
+        clearInterval(urgencyInterval);
         localStorage.setItem('nfz_answers', JSON.stringify(answers));
+        document.getElementById('urgency-banner').style.display = 'none';
         document.getElementById('question-area').innerHTML = `
           <div class="done-screen">
             <span class="done-icon">✓</span>
@@ -305,7 +392,7 @@
         questionHTML += `
             <p class="muted" style="font-size:0.78rem;margin-bottom:0.6rem;">Quick pick or write your own:</p>
             <div class="reaction-row" id="chip-row">
-              ${q.chips.map(c => `<div class="reaction-chip" onclick="selectChip(this, '${c}')">${c}</div>`).join('')}
+              ${q.chips.map(c => `<div class="reaction-chip" onclick="selectChip(this,'${c}')">${c}</div>`).join('')}
             </div>`;
       }
 
@@ -351,8 +438,8 @@
         zone.classList.add('has-image');
         img.src = imageData;
         img.style.display = 'block';
-        zone.querySelector('.upload-icon') && (zone.querySelector('.upload-icon').style.display = 'none');
-        zone.querySelector('.upload-label') && (zone.querySelector('.upload-label').style.display = 'none');
+        if (zone.querySelector('.upload-icon')) zone.querySelector('.upload-icon').style.display = 'none';
+        if (zone.querySelector('.upload-label')) zone.querySelector('.upload-label').style.display = 'none';
       };
       reader.readAsDataURL(file);
     }
@@ -373,12 +460,10 @@
       const err = document.getElementById('q-error');
       const q = QUESTIONS[currentQ];
 
-      // Image question — text is optional if image provided
       if (q.type === 'image') {
-        const answer = ta ? ta.value.trim() : '';
         answers[currentQ] = {
           type: 'image',
-          text: answer || selectedChip || 'No comment provided',
+          text: ta ? ta.value.trim() || selectedChip || 'No comment provided' : 'No comment',
           image: imageData
         };
         currentQ++;
@@ -396,22 +481,14 @@
         return;
       }
 
-      answers[currentQ] = {
-        type: 'text',
-        text: ta.value.trim() || selectedChip
-      };
+      answers[currentQ] = { type: 'text', text: ta.value.trim() || selectedChip };
       currentQ++;
       renderQuestion();
     }
 
     function prevQuestion() {
-      if (currentQ > 0) {
-        currentQ--;
-        renderQuestion();
-      }
+      if (currentQ > 0) { currentQ--; renderQuestion(); }
     }
-
-    renderQuestion();
   </script>
 
 </body>

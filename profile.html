@@ -95,13 +95,107 @@
       margin-top: 2px;
     }
     .preview-arrow { color: #444; font-size: 1.2rem; }
+
+    /* TIMER STYLES */
+    .timer-box {
+      background: #0a0000;
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .timer-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--red);
+    }
+    .timer-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.5rem;
+    }
+    .timer-display {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2.4rem;
+      color: var(--white);
+      letter-spacing: 0.05em;
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+    .timer-display.urgent { color: var(--red); animation: urgentPulse 1s infinite; }
+    @keyframes urgentPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .timer-sub {
+      font-size: 0.8rem;
+      color: #555;
+    }
+    .timer-progress {
+      background: #1a0000;
+      border-radius: 2px;
+      height: 3px;
+      margin-top: 1rem;
+    }
+    .timer-progress-fill {
+      height: 100%;
+      background: var(--red);
+      border-radius: 2px;
+      transition: width 1s linear;
+    }
+
+    .expired-box {
+      background: #0a0a0a;
+      border: 0.5px solid #222;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .activate-box {
+      background: #050510;
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .activate-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--purple);
+    }
+    .activate-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .activate-sub {
+      color: #666;
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
   </style>
 </head>
 <body>
 
   <a href="index.html" class="nav-back">← home</a>
 
-  <div class="section-label">Your profile is live</div>
+  <div class="section-label">Your profile</div>
 
   <!-- PROFILE CARD -->
   <div class="card" id="profile-card">
@@ -111,25 +205,28 @@
     <div class="pills" id="profile-pills"></div>
   </div>
 
-  <!-- SHARE BOX -->
-  <div class="section-label" style="margin-top:1.5rem;">Your shareable link</div>
-  <div class="share-box">
-    <div class="share-url" id="share-url"></div>
-    <div style="display:flex;gap:10px;margin-top:10px;">
-      <button class="photo-btn" style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="copyLink()">Copy link</button>
-      <button class="photo-btn" style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="shareLink()">Share →</button>
-    </div>
-    <span id="copy-confirm" class="success-msg" style="display:none;margin-top:6px;display:none;">Copied to clipboard!</span>
-  </div>
+  <!-- TIMER SECTION -->
+  <div id="timer-section"></div>
 
-  <!-- CAPTION -->
-  <div class="card" style="border-color:#1a1a1a;">
-    <div class="section-label">Caption to post</div>
-    <p style="font-style:italic;font-size:0.9rem;color:#aaa;line-height:1.7;">
-      "Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. I can take it. Link in bio."
-    </p>
-    <button onclick="copyCaption()" style="background:none;border:none;color:#555;font-size:0.78rem;cursor:pointer;margin-top:8px;padding:0;font-family:'DM Sans',sans-serif;">Copy caption</button>
-    <span id="caption-confirm" class="success-msg" style="display:none;">Copied!</span>
+  <!-- SHARE BOX -->
+  <div id="share-section" style="display:none;">
+    <div class="section-label">Your shareable link</div>
+    <div class="share-box">
+      <div class="share-url" id="share-url"></div>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="copyLink()">Copy link</button>
+        <button style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="shareLink()">Share →</button>
+      </div>
+      <span id="copy-confirm" class="success-msg" style="display:none;margin-top:6px;">Copied!</span>
+    </div>
+
+    <!-- CAPTION -->
+    <div class="card" style="border-color:#1a1a1a;">
+      <div class="section-label">Caption to post</div>
+      <p id="caption-text" style="font-style:italic;font-size:0.9rem;color:#aaa;line-height:1.7;"></p>
+      <button onclick="copyCaption()" style="background:none;border:none;color:#555;font-size:0.78rem;cursor:pointer;margin-top:8px;padding:0;font-family:'DM Sans',sans-serif;">Copy caption</button>
+      <span id="caption-confirm" class="success-msg" style="display:none;">Copied!</span>
+    </div>
   </div>
 
   <!-- STATS -->
@@ -144,15 +241,15 @@
     </div>
   </div>
 
-  <!-- ACTIVITY FEED -->
+  <!-- ACTIVITY -->
   <div class="card" style="border-color:#1a1a1a;">
     <div class="section-label">Activity</div>
     <div id="activity-feed">
-      <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">No activity yet. Share your link to get responses.</div>
+      <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">No activity yet. Activate your link to get responses.</div>
     </div>
   </div>
 
-  <!-- QUICK LINKS -->
+  <!-- PAGES -->
   <div class="section-label" style="margin-top:1.5rem;">Pages</div>
   <a href="respond.html" class="preview-btn">
     <div>
@@ -179,6 +276,8 @@
   <script src="app.js"></script>
   <script>
     let responseCount = 0;
+    let timerInterval = null;
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
 
     const profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
     if (!profile.name) window.location.href = 'create.html';
@@ -195,17 +294,18 @@
     document.getElementById('profile-meta').textContent = `${profile.age} yrs • ${profile.job}`;
 
     const handle = profile.name.toLowerCase().replace(/\s+/g, '');
-    document.getElementById('share-url').textContent = `nofilter.zim/u/${handle}`;
+    document.getElementById('share-url').textContent = `nofilterzim.netlify.app/respond.html?u=${handle}`;
 
     const pillsEl = document.getElementById('profile-pills');
-    [profile.rel, profile.good ? 'Great at: ' + profile.good : null, profile.flex].filter(Boolean).forEach(p => {
-      const span = document.createElement('span');
-      span.className = 'pill';
-      span.textContent = p;
-      pillsEl.appendChild(span);
-    });
+    [profile.rel, profile.good ? 'Great at: ' + profile.good : null, profile.flex]
+      .filter(Boolean).forEach(p => {
+        const span = document.createElement('span');
+        span.className = 'pill';
+        span.textContent = p;
+        pillsEl.appendChild(span);
+      });
 
-    // Fake views counter
+    // Views
     let views = parseInt(localStorage.getItem('nfz_views') || '0');
     views += Math.floor(Math.random() * 8) + 1;
     localStorage.setItem('nfz_views', views);
@@ -215,30 +315,156 @@
     document.getElementById('response-count').textContent = responseCount;
     updateBtn();
 
+    // ── TIMER LOGIC ──
+    function renderTimerSection() {
+      const timerSection = document.getElementById('timer-section');
+      const shareSection = document.getElementById('share-section');
+      const expiresAt = localStorage.getItem('nfz_expires_at');
+      const now = Date.now();
+
+      // Not activated yet
+      if (!expiresAt) {
+        timerSection.innerHTML = `
+          <div class="activate-box">
+            <div class="activate-title">⏱️ Timed Roast Mode</div>
+            <div class="activate-sub">
+              Activate your link for exactly 24 hours.<br>
+              Post it. Create urgency. Close it tonight.<br>
+              <strong style="color:#9b5fff;">People respond more when time is running out.</strong>
+            </div>
+            <button class="btn-villain" style="max-width:100%;margin-top:0;" onclick="activateTimer()">
+              Activate 24-hour link →
+            </button>
+          </div>`;
+        shareSection.style.display = 'none';
+        return;
+      }
+
+      const expires = parseInt(expiresAt);
+
+      // Expired
+      if (now >= expires) {
+        timerSection.innerHTML = `
+          <div class="expired-box">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">⌛</div>
+            <h3 style="margin-bottom:0.5rem;">Your link has closed</h3>
+            <p class="muted" style="margin-bottom:1.25rem;font-size:0.88rem;">
+              Your 24 hours are up. Generate your roast with the responses you got,
+              or reactivate for another round.
+            </p>
+            <button class="btn-primary" onclick="goGenerate()" style="margin-bottom:10px;">
+              Generate my roast →
+            </button>
+            <button class="btn-ghost" style="margin-top:0;" onclick="reactivateTimer()">
+              Reactivate for another 24hrs
+            </button>
+          </div>`;
+        shareSection.style.display = 'none';
+        clearInterval(timerInterval);
+        return;
+      }
+
+      // Active — show countdown
+      shareSection.style.display = 'block';
+      updateCaptionText(expires);
+
+      const remaining = expires - now;
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const secs = Math.floor((remaining % (1000 * 60)) / 1000);
+      const pct = ((TWENTY_FOUR_HOURS - remaining) / TWENTY_FOUR_HOURS) * 100;
+      const isUrgent = hours < 2;
+
+      timerSection.innerHTML = `
+        <div class="timer-box">
+          <div class="timer-label">⏱️ Link closes in</div>
+          <div class="timer-display ${isUrgent ? 'urgent' : ''}">
+            ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}
+          </div>
+          <div class="timer-sub">
+            ${isUrgent
+              ? '🔥 Less than 2 hours left — remind your followers now!'
+              : 'Your link is live. Share it everywhere.'}
+          </div>
+          <div class="timer-progress">
+            <div class="timer-progress-fill" style="width:${pct}%"></div>
+          </div>
+        </div>`;
+    }
+
+    function updateCaptionText(expires) {
+      const remaining = expires - Date.now();
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+      const timeStr = hours > 0 ? `${hours} hours` : `${mins} minutes`;
+      const captionEl = document.getElementById('caption-text');
+      if (captionEl) {
+        captionEl.textContent = `"Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. Link closes in ${timeStr} — link in bio."`;
+      }
+    }
+
+    function activateTimer() {
+      const expiresAt = Date.now() + TWENTY_FOUR_HOURS;
+      localStorage.setItem('nfz_expires_at', expiresAt);
+      startTimerInterval();
+      renderTimerSection();
+    }
+
+    function reactivateTimer() {
+      const expiresAt = Date.now() + TWENTY_FOUR_HOURS;
+      localStorage.setItem('nfz_expires_at', expiresAt);
+      localStorage.removeItem('nfz_response_count');
+      responseCount = 0;
+      document.getElementById('response-count').textContent = 0;
+      document.getElementById('activity-feed').innerHTML = `
+        <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">New round started. Share your link again.</div>`;
+      updateBtn();
+      startTimerInterval();
+      renderTimerSection();
+    }
+
+    function startTimerInterval() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        renderTimerSection();
+        updateCaptionText(parseInt(localStorage.getItem('nfz_expires_at')));
+      }, 1000);
+    }
+
     function copyLink() {
-      navigator.clipboard.writeText(`nofilter.zim/u/${handle}`);
+      const url = document.getElementById('share-url').textContent;
+      navigator.clipboard.writeText(url);
       const el = document.getElementById('copy-confirm');
       el.style.display = 'block';
       setTimeout(() => el.style.display = 'none', 2000);
     }
 
     function shareLink() {
-      const text = `Tell me what you REALLY think of me 😈 Be anonymous. Be brutal.\n\nnofilter.zim/u/${handle}`;
-      if (navigator.share) {
-        navigator.share({ title: 'No Filter Zim', text });
-      } else {
-        copyLink();
-      }
+      const expiresAt = parseInt(localStorage.getItem('nfz_expires_at'));
+      const remaining = expiresAt - Date.now();
+      const hours = Math.floor(remaining / (1000 * 60 * 60));
+      const text = `Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. Link closes in ${hours} hours.\n\nnofilterzim.netlify.app/respond.html?u=${handle}`;
+      navigator.share ? navigator.share({ title: 'No Filter Zim', text }) : copyLink();
     }
 
     function copyCaption() {
-      navigator.clipboard.writeText(`Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. I can take it. Link in bio.`);
+      const text = document.getElementById('caption-text').textContent;
+      navigator.clipboard.writeText(text);
       const el = document.getElementById('caption-confirm');
       el.style.display = 'inline';
       setTimeout(() => el.style.display = 'none', 2000);
     }
 
     function simulateResponses() {
+      const expiresAt = localStorage.getItem('nfz_expires_at');
+      if (!expiresAt) {
+        alert('Activate your timed link first!');
+        return;
+      }
+      if (Date.now() >= parseInt(expiresAt)) {
+        alert('Your link has expired. Reactivate to get more responses.');
+        return;
+      }
       responseCount = Math.floor(Math.random() * 6) + 4;
       localStorage.setItem('nfz_response_count', responseCount);
       document.getElementById('response-count').textContent = responseCount;
@@ -271,8 +497,17 @@
     function resetProfile() {
       if (confirm('This will delete your profile and all responses. Are you sure?')) {
         clearData();
+        localStorage.removeItem('nfz_expires_at');
+        localStorage.removeItem('nfz_views');
         window.location.href = 'index.html';
       }
+    }
+
+    // Init
+    renderTimerSection();
+    const expiresAt = localStorage.getItem('nfz_expires_at');
+    if (expiresAt && Date.now() < parseInt(expiresAt)) {
+      startTimerInterval();
     }
   </script>
 
