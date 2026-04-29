@@ -7,7 +7,11 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
+<script>
+  if (!localStorage.getItem('nfz_onboarded')) {
+    window.location.href = 'onboarding.html';
+  }
+</script>
   <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:3rem;">
     <div>
       <div class="logo">no<span>filter</span> <span style="color:#555;font-size:1rem;">zim</span></div>

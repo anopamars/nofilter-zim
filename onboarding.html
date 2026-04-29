@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--black);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* SLIDES WRAPPER */
+    .slides-track {
+      display: flex;
+      width: 400%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.77, 0, 0.175, 1);
+    }
+
+    .slide {
+      width: 25%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 3rem 2rem;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* BACKGROUND EFFECTS */
+    .slide-bg {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 0;
+    }
+    .slide-1 .slide-bg {
+      background: radial-gradient(ellipse at 50% 60%, #1a0000 0%, #0a0a0a 70%);
+    }
+    .slide-2 .slide-bg {
+      background: radial-gradient(ellipse at 30% 40%, #0d0015 0%, #0a0a0a 70%);
+    }
+    .slide-3 .slide-bg {
+      background: radial-gradient(ellipse at 70% 50%, #001a0a 0%, #0a0a0a 70%);
+    }
+    .slide-4 .slide-bg {
+      background: radial-gradient(ellipse at 50% 50%, #1a0800 0%, #0a0a0a 70%);
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      max-width: 340px;
+      width: 100%;
+    }
+
+    /* CINEMATIC LINES */
+    .cinema-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 60px;
+      background: #000;
+      z-index: 2;
+    }
+    .cinema-top { top: 0; }
+    .cinema-bottom { bottom: 0; }
+
+    /* SLIDE ICONS */
+    .slide-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      animation: iconFloat 3s ease-in-out infinite;
+    }
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* SLIDE TEXT */
+    .slide-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+    .slide-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2.4rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .slide-headline em {
+      font-style: normal;
+    }
+    .slide-1 .slide-headline em { color: var(--red); }
+    .slide-2 .slide-headline em { color: var(--purple); }
+    .slide-3 .slide-headline em { color: #ffe135; }
+    .slide-4 .slide-headline em { color: var(--red); }
+
+    .slide-body {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+
+    /* FEATURE LIST */
+    .feature-list {
+      text-align: left;
+      width: 100%;
+      margin-bottom: 2rem;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 0.5px solid #111;
+      animation: featureSlide 0.4s ease forwards;
+      opacity: 0;
+    }
+    .feature-item:last-child { border-bottom: none; }
+    @keyframes featureSlide {
+      from { opacity: 0; transform: translateX(-10px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .feature-icon {
+      font-size: 1.2rem;
+      min-width: 28px;
+      text-align: center;
+      margin-top: 1px;
+    }
+    .feature-text { flex: 1; }
+    .feature-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+    .feature-desc { font-size: 0.78rem; color: #555; line-height: 1.4; }
+
+    /* DOTS */
+    .dots-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .dot-ind {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: #222;
+      transition: all 0.3s ease;
+    }
+    .dot-ind.active {
+      background: var(--red);
+      width: 24px;
+    }
+
+    /* BUTTONS */
+    .slide-btn {
+      background: var(--red);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 320px;
+      transition: transform 0.15s, background 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .slide-btn:hover { background: #e02020; transform: translateY(-1px); }
+    .slide-btn:active { transform: scale(0.98); }
+
+    .slide-btn-ghost {
+      background: transparent;
+      color: #444;
+      border: none;
+      padding: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+      max-width: 320px;
+      margin-top: 8px;
+      transition: color 0.15s;
+    }
+    .slide-btn-ghost:hover { color: #888; }
+
+    /* SKIP */
+    .skip-btn {
+      position: fixed;
+      top: 80px;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      z-index: 10;
+      transition: color 0.15s;
+    }
+    .skip-btn:hover { color: #666; }
+
+    /* SWIPE HINT */
+    .swipe-hint {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.72rem;
+      color: #222;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      z-index: 10;
+      animation: hintFade 2s ease 2s forwards;
+      opacity: 1;
+    }
+    @keyframes hintFade { to { opacity: 0; } }
+
+    /* LOGO ANIMATION */
+    .logo-anim {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: logoReveal 0.8s ease 0.3s forwards;
+    }
+    .logo-anim span { color: var(--red); }
+    @keyframes logoReveal {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* STAT PILLS */
+    .stat-pills {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    .stat-pill {
+      background: #111;
+      border: 0.5px solid #1a1a1a;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      color: #666;
+    }
+    .stat-pill strong {
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+    }
+
+    /* GLITCH EFFECT ON HEADLINE */
+    .glitch {
+      position: relative;
+    }
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      overflow: hidden;
+    }
+    .glitch::before {
+      color: var(--red);
+      animation: glitch1 3s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+    }
+    .glitch::after {
+      color: #4a6fff;
+      animation: glitch2 3s infinite;
+      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    }
+    @keyframes glitch1 {
+      0%, 90%, 100% { transform: none; opacity: 0; }
+      92% { transform: translateX(-3px); opacity: 0.8; }
+      94% { transform: translateX(3px); opacity: 0.8; }
+      96% { transform: none; opacity: 0; }
+    }
+    @keyframes glitch2 {
+      0%, 90%, 100% { transform: none; opacity: 0; }
+      93% { transform: translateX(3px); opacity: 0.8; }
+      95% { transform: translateX(-3px); opacity: 0.8; }
+      97% { transform: none; opacity: 0; }
+    }
+
+    /* SCAN LINE */
+    .scanline {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(255, 45, 45, 0.15);
+      animation: scan 4s linear infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+    @keyframes scan {
+      0% { top: 0; }
+      100% { top: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CINEMATIC BARS -->
+  <div class="cinema-line cinema-top"></div>
+  <div class="cinema-line cinema-bottom"></div>
+
+  <!-- SKIP -->
+  <button class="skip-btn" onclick="finish()">Skip →</button>
+
+  <!-- SWIPE HINT -->
+  <div class="swipe-hint">swipe to continue</div>
+
+  <!-- SLIDES -->
+  <div class="slides-track" id="slides-track">
+
+    <!-- SLIDE 1: HOOK -->
+    <div class="slide slide-1">
+      <div class="slide-bg"></div>
+      <div class="scanline"></div>
+      <div class="slide-content">
+        <div class="logo-anim">no<span>filter</span> <span style="color:#555;font-size:0.9rem;">zim</span></div>
+        <span class="slide-icon">💀</span>
+        <div class="slide-eyebrow">Zimbabwe's most brutal app</div>
+        <div class="slide-headline glitch" data-text="What do people really think of you?">
+          What do people <em>really</em> think of you?
+        </div>
+        <div class="slide-body">
+          Not what they say to your face.<br>
+          What they say behind your back.
+        </div>
+        <div class="dots-row" id="dots-1">
+          <div class="dot-ind active"></div>
+          <div class="dot-ind"></div>
+          <div class="dot-ind"></div>
+          <div class="dot-ind"></div>
+        </div>
+        <button class="slide-btn" onclick="goTo(1)">Find out →</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: CONCEPT -->
+    <div class="slide slide-2">
+      <div class="slide-bg"></div>
+      <div class="slide-content">
+        <span class="slide-icon">🔗</span>
+        <div class="slide-eyebrow">How it works</div>
+        <div class="slide-headline">Share your link.<br><em>Brace yourself.</em></div>
+        <div class="slide-body">
+          Create your profile. Activate your 24-hour link.
+          Post it. Your followers answer anonymously.
+          AI turns their answers into one brutal roast card.
+        </div>
+        <div class="stat-pills">
+          <div class="stat-pill"><strong>24hrs</strong> only</div>
+          <div class="stat-pill"><strong>100%</strong> anonymous</div>
+          <div class="stat-pill"><strong>AI</strong> powered</div>
+        </div>
+        <div class="dots-row">
+          <div class="dot-ind"></div>
+          <div class="dot-ind active"></div>
+          <div class="dot-ind"></div>
+          <div class="dot-ind"></div>
+        </div>
+        <button class="slide-btn" onclick="goTo(2)">What do I get? →</button>
+        <button class="slide-btn-ghost" onclick="goTo(0)">← Back</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: FEATURES -->
+    <div class="slide slide-3">
+      <div class="slide-bg"></div>
+      <div class="slide-content">
+        <span class="slide-icon" style="animation-delay:0.5s;">⚡</span>
+        <div class="slide-eyebrow">What you get</div>
+        <div class="slide-headline">More than just <em>a roast.</em></div>
+
+        <div class="feature-list" id="feature-list">
+          <div class="feature-item" style="animation-delay:0.1s;">
+            <div class="feature-icon">🔥</div>
+            <div class="feature-text">
+              <div class="feature-title">AI Roast Card</div>
+              <div class="feature-desc">Brutal, personal, shareable roast based on real responses</div>
+            </div>
+          </div>
+          <div class="feature-item" style="animation-delay:0.2s;">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-text">
+              <div class="feature-title">Villain Arc Plan</div>
+              <div class="feature-desc">3 specific missions to flip your reputation in 30 days</div>
+            </div>
+          </div>
+          <div class="feature-item" style="animation-delay:0.3s;">
+            <div class="feature-icon">🎵</div>
+            <div class="feature-text">
+              <div class="feature-title">Roast Playlist</div>
+              <div class="feature-desc">AI picks songs that match the energy of your roast</div>
+            </div>
+          </div>
+          <div class="feature-item" style="animation-delay:0.4s;">
+            <div class="feature-icon">🏆</div>
+            <div class="feature-text">
+              <div class="feature-title">Zim Leaderboard</div>
+              <div class="feature-desc">Ranked by city — Harare, Bulawayo, Mutare and more</div>
+            </div>
+          </div>
+          <div class="feature-item" style="animation-delay:0.5s;">
+            <div class="feature-icon">🎭</div>
+            <div class="feature-text">
+              <div class="feature-title">RAW Squad Battles</div>
+              <div class="feature-desc">Wild N Out style team roast battles with wildcard rounds</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dots-row">
+          <div class="dot-ind"></div>
+          <div class="dot-ind"></div>
+          <div class="dot-ind active"></div>
+          <div class="dot-ind"></div>
+        </div>
+        <button class="slide-btn" onclick="goTo(3)">I'm ready →</button>
+        <button class="slide-btn-ghost" onclick="goTo(1)">← Back</button>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: GET STARTED -->
+    <div class="slide slide-4">
+      <div class="slide-bg"></div>
+      <div class="scanline"></div>
+      <div class="slide-content">
+        <span class="slide-icon" style="animation-delay:1s;">🇿🇼</span>
+        <div class="slide-eyebrow">Built for Zimbabwe</div>
+        <div class="slide-headline">Ready to get <em>roasted?</em></div>
+        <div class="slide-body">
+          Create your profile in 60 seconds.
+          Share your link. Let the people talk.
+          Then face the truth.
+        </div>
+
+        <div style="background:#111;border:0.5px solid #1a1a1a;border-radius:8px;padding:1rem;margin-bottom:1.5rem;text-align:left;">
+          <div style="font-size:0.72rem;color:#444;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.5rem;">Remember</div>
+          <div style="font-size:0.82rem;color:#666;line-height:1.6;">
+            ✓ Responses are always anonymous<br>
+            ✓ Your link closes after 24 hours<br>
+            ✓ You control when to generate your roast<br>
+            ✓ The villain arc is your glow-up plan
+          </div>
+        </div>
+
+        <div class="dots-row">
+          <div class="dot-ind"></div>
+          <div class="dot-ind"></div>
+          <div class="dot-ind"></div>
+          <div class="dot-ind active"></div>
+        </div>
+        <button class="slide-btn" onclick="finish()">Create my profile →</button>
+        <button class="slide-btn-ghost" onclick="goTo(2)">← Back</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let current = 0;
+    let startX = 0;
+    let isDragging = false;
+
+    function goTo(index) {
+      current = index;
+      document.getElementById('slides-track').style.transform = `translateX(-${index * 25}%)`;
+
+      // Animate features on slide 3
+      if (index === 2) {
+        document.querySelectorAll('.feature-item').forEach((item, i) => {
+          item.style.opacity = '0';
+          item.style.animation = 'none';
+          setTimeout(() => {
+            item.style.animation = `featureSlide 0.4s ease ${i * 0.1}s forwards`;
+          }, 50);
+        });
+      }
+    }
+
+    function finish() {
+      localStorage.setItem('nfz_onboarded', 'true');
+      window.location.href = 'create.html';
+    }
+
+    // Touch swipe support
+    const track = document.getElementById('slides-track');
+
+    track.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      if (!isDragging) return;
+      const diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0 && current < 3) goTo(current + 1);
+        if (diff < 0 && current > 0) goTo(current - 1);
+      }
+      isDragging = false;
+    }, { passive: true });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' && current < 3) goTo(current + 1);
+      if (e.key === 'ArrowLeft' && current > 0) goTo(current - 1);
+      if (e.key === 'Enter' && current === 3) finish();
+    });
+  </script>
+
+</body>
+</html>
