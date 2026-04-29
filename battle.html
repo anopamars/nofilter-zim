@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roast Battle — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* BATTLE HEADER */
+    .battle-header {
+      text-align: center;
+      padding: 1.5rem 0 2rem;
+    }
+    .battle-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2.2rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.25rem;
+    }
+    .battle-title span { color: var(--red); }
+    .vs-badge {
+      display: inline-block;
+      background: var(--red);
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 0.8rem;
+      padding: 4px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.1em;
+      margin: 0.75rem 0;
+    }
+
+    /* FIGHTER CARDS */
+    .fighters-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .fighter-card {
+      background: #111;
+      border: 0.5px solid #222;
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      transition: border-color 0.2s;
+      cursor: pointer;
+      position: relative;
+    }
+    .fighter-card.voted {
+      border-color: var(--red);
+      background: #0a0000;
+    }
+    .fighter-card.winner {
+      border-color: #c8a84b;
+      background: #120a00;
+    }
+    .fighter-card.loser {
+      border-color: #333;
+      opacity: 0.6;
+    }
+    .fighter-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      color: white;
+      margin: 0 auto 0.75rem;
+    }
+    .fighter-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .fighter-avatar.blue { background: #1a3a8a; }
+    .fighter-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .fighter-meta {
+      font-size: 0.72rem;
+      color: #555;
+      margin-bottom: 0.75rem;
+    }
+    .fighter-roast {
+      font-size: 0.78rem;
+      color: #888;
+      line-height: 1.5;
+      text-align: left;
+      background: #0a0a0a;
+      border-radius: 4px;
+      padding: 0.6rem;
+      margin-bottom: 0.75rem;
+      display: none;
+    }
+    .vote-btn {
+      background: #1a1a1a;
+      border: 0.5px solid #333;
+      color: #aaa;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.78rem;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.15s;
+    }
+    .vote-btn:hover { background: var(--red); border-color: var(--red); color: white; }
+    .vote-btn.voted { background: var(--red); border-color: var(--red); color: white; }
+    .vote-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .vs-divider {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--red);
+      text-align: center;
+    }
+
+    /* VOTE BAR */
+    .vote-bar-wrap {
+      margin-bottom: 1.5rem;
+    }
+    .vote-bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #555;
+      margin-bottom: 6px;
+    }
+    .vote-bar-track {
+      background: #1a1a1a;
+      border-radius: 4px;
+      height: 10px;
+      overflow: hidden;
+      display: flex;
+    }
+    .vote-bar-a {
+      background: var(--red);
+      height: 100%;
+      transition: width 0.5s ease;
+      border-radius: 4px 0 0 4px;
+    }
+    .vote-bar-b {
+      background: #1a3a8a;
+      height: 100%;
+      transition: width 0.5s ease;
+      border-radius: 0 4px 4px 0;
+    }
+    .vote-counts {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+    }
+    .vote-count {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--white);
+    }
+    .vote-pct { font-size: 0.72rem; color: #555; }
+
+    /* BATTLE STATUS */
+    .battle-status {
+      background: #111;
+      border: 0.5px solid #222;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #3a3;
+      animation: livePulse 2s infinite;
+      margin-right: 8px;
+      display: inline-block;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+    .battle-timer {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--red);
+    }
+
+    /* SCREENS */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* SETUP SCREEN */
+    .setup-card {
+      background: #050510;
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .setup-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--purple);
+    }
+
+    /* WINNER SCREEN */
+    .winner-screen {
+      text-align: center;
+      padding: 2rem 0;
+    }
+    .winner-crown {
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+      display: block;
+      animation: crownBounce 0.5s ease;
+    }
+    @keyframes crownBounce {
+      0% { transform: scale(0); }
+      60% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    .winner-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      color: #c8a84b;
+      margin-bottom: 0.25rem;
+    }
+    .loser-shame {
+      background: #0a0a0a;
+      border: 0.5px solid #222;
+      border-radius: 8px;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+    .shame-title {
+      font-size: 0.72rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 0.75rem;
+    }
+    .shame-text {
+      font-size: 0.88rem;
+      color: #888;
+      line-height: 1.6;
+    }
+
+    /* OPEN BATTLES */
+    .open-battle-card {
+      background: #111;
+      border: 0.5px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .open-battle-card:hover { border-color: #333; }
+    .open-battle-info { flex: 1; }
+    .open-battle-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 2px;
+    }
+    .open-battle-meta { font-size: 0.75rem; color: #555; }
+    .join-badge {
+      background: var(--red);
+      color: white;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.72rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .waiting-badge {
+      background: #1a1a1a;
+      color: #555;
+      font-size: 0.72rem;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="nav-back">← home</a>
+
+  <!-- SCREEN 1: LOBBY -->
+  <div id="screen-lobby" class="screen active">
+    <div class="battle-header">
+      <div class="battle-title">🎭 Roast <span>Battle</span></div>
+      <div style="color:#555;font-size:0.88rem;margin-top:0.25rem;">
+        Two people. One roast. Followers decide who lost.
+      </div>
+    </div>
+
+    <!-- START BATTLE -->
+    <div class="setup-card">
+      <div class="section-label" style="color:var(--purple);">Start a battle</div>
+      <p style="color:#666;font-size:0.85rem;margin-bottom:1.25rem;line-height:1.6;">
+        Create an open battle link. Share it — anyone can join as your opponent.
+        Your followers then vote on who got roasted harder.
+      </p>
+      <button class="btn-villain" style="margin-top:0;" onclick="createBattle()">
+        ⚔️ Start a battle →
+      </button>
+    </div>
+
+    <!-- OPEN BATTLES -->
+    <div class="section-label">Open battles — join as opponent</div>
+    <div id="open-battles-list"></div>
+
+    <!-- COMPLETED -->
+    <div class="section-label" style="margin-top:1.5rem;">Recent results</div>
+    <div id="completed-battles-list"></div>
+  </div>
+
+  <!-- SCREEN 2: WAITING FOR OPPONENT -->
+  <div id="screen-waiting" class="screen">
+    <div class="battle-header">
+      <div class="battle-title">⚔️ Battle <span>Created</span></div>
+    </div>
+
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2.5rem;margin-bottom:1rem;">⏳</div>
+      <h3 style="margin-bottom:0.5rem;">Waiting for an opponent</h3>
+      <p class="muted" style="font-size:0.85rem;margin-bottom:1.5rem;line-height:1.6;">
+        Share this link. Anyone who opens it becomes your opponent.
+        Once they join the battle goes live.
+      </p>
+      <div class="share-box" style="text-align:left;">
+        <div class="share-url" id="battle-share-url"></div>
+        <div style="display:flex;gap:8px;margin-top:10px;">
+          <button style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 14px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="copyBattleLink()">Copy link</button>
+          <button style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 14px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="shareBattleLink()">Share →</button>
+        </div>
+        <span id="battle-copy-confirm" class="success-msg" style="display:none;margin-top:6px;">Copied!</span>
+      </div>
+      <div style="margin-top:1rem;color:#333;font-size:0.8rem;">
+        Caption: "Who wants to battle me? 😈 First one to open this link is my opponent. nofilter.zim"
+      </div>
+    </div>
+
+    <button class="btn-ghost" onclick="simulateOpponentJoin()">
+      Simulate opponent joining (demo)
+    </button>
+    <button class="btn-ghost" style="margin-top:8px;color:#333;border-color:#1a1a1a;" onclick="cancelBattle()">
+      Cancel battle
+    </button>
+  </div>
+
+  <!-- SCREEN 3: ACTIVE BATTLE — VOTING -->
+  <div id="screen-battle" class="screen">
+    <div class="battle-header">
+      <div class="section-label" style="text-align:center;">
+        <span class="status-dot"></span>Battle is live
+      </div>
+      <div class="battle-title">🎭 Roast <span>Battle</span></div>
+    </div>
+
+    <!-- TIMER -->
+    <div class="battle-status">
+      <div style="font-size:0.85rem;color:#666;">
+        <span class="status-dot"></span>Voting closes in
+      </div>
+      <div class="battle-timer" id="battle-timer">24:00:00</div>
+    </div>
+
+    <!-- FIGHTERS -->
+    <div class="fighters-row">
+      <div class="fighter-card" id="fighter-a" onclick="vote('a')">
+        <div class="fighter-avatar" id="avatar-a">A</div>
+        <div class="fighter-name" id="name-a">Fighter A</div>
+        <div class="fighter-meta" id="meta-a"></div>
+        <div class="fighter-roast" id="roast-a"></div>
+        <button class="vote-btn" id="vote-btn-a">Vote 🔥</button>
+      </div>
+
+      <div class="vs-divider">VS</div>
+
+      <div class="fighter-card" id="fighter-b" onclick="vote('b')">
+        <div class="fighter-avatar blue" id="avatar-b">B</div>
+        <div class="fighter-name" id="name-b">Fighter B</div>
+        <div class="fighter-meta" id="meta-b"></div>
+        <div class="fighter-roast" id="roast-b"></div>
+        <button class="vote-btn" id="vote-btn-b">Vote 🔥</button>
+      </div>
+    </div>
+
+    <!-- VOTE BAR -->
+    <div class="vote-bar-wrap">
+      <div class="vote-bar-labels">
+        <span id="label-a">Fighter A</span>
+        <span id="label-b">Fighter B</span>
+      </div>
+      <div class="vote-bar-track">
+        <div class="vote-bar-a" id="bar-a" style="width:50%"></div>
+        <div class="vote-bar-b" id="bar-b" style="width:50%"></div>
+      </div>
+      <div class="vote-counts">
+        <div>
+          <div class="vote-count" id="count-a">0</div>
+          <div class="vote-pct" id="pct-a">50%</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="vote-count" id="count-b">0</div>
+          <div class="vote-pct" id="pct-b">50%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ROASTS -->
+    <div class="section-label">The roasts</div>
+    <div class="card" style="margin-bottom:0.75rem;">
+      <div style="font-size:0.72rem;color:var(--red);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">
+        🔥 <span id="roast-label-a">Fighter A</span>'s roast
+      </div>
+      <p id="full-roast-a" style="font-size:0.88rem;color:#aaa;line-height:1.7;"></p>
+    </div>
+    <div class="card">
+      <div style="font-size:0.72rem;color:#1a5fff;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.5rem;">
+        🔥 <span id="roast-label-b">Fighter B</span>'s roast
+      </div>
+      <p id="full-roast-b" style="font-size:0.88rem;color:#aaa;line-height:1.7;"></p>
+    </div>
+
+    <div id="voted-msg" style="display:none;text-align:center;padding:1rem 0;color:#555;font-size:0.85rem;">
+      ✓ Vote recorded. Results update live.
+    </div>
+
+    <button class="btn-ghost" style="margin-top:1rem;" onclick="simulateVotes()">
+      Simulate votes (demo)
+    </button>
+    <button class="btn-ghost" style="margin-top:8px;" onclick="endBattle()">
+      End battle + see results
+    </button>
+  </div>
+
+  <!-- SCREEN 4: RESULTS -->
+  <div id="screen-results" class="screen">
+    <div class="winner-screen">
+      <span class="winner-crown">👑</span>
+      <div class="section-label" style="text-align:center;">Winner</div>
+      <div class="winner-name" id="winner-name">—</div>
+      <p class="muted" style="font-size:0.85rem;margin-top:0.25rem;" id="winner-meta"></p>
+    </div>
+
+    <!-- FINAL SCORES -->
+    <div class="fighters-row" style="margin-bottom:1.5rem;">
+      <div class="fighter-card winner" id="result-card-a">
+        <div class="fighter-avatar" id="result-avatar-a">A</div>
+        <div class="fighter-name" id="result-name-a"></div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;margin:0.5rem 0;" id="result-votes-a">0</div>
+        <div style="font-size:0.7rem;color:#555;">votes</div>
+      </div>
+      <div class="vs-divider">VS</div>
+      <div class="fighter-card loser" id="result-card-b">
+        <div class="fighter-avatar blue" id="result-avatar-b">B</div>
+        <div class="fighter-name" id="result-name-b"></div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;margin:0.5rem 0;" id="result-votes-b">0</div>
+        <div style="font-size:0.7rem;color:#555;">votes</div>
+      </div>
+    </div>
+
+    <!-- LOSER SHAME -->
+    <div class="loser-shame">
+      <div class="shame-title">💀 The L has been recorded</div>
+      <p class="shame-text" id="loser-shame-text"></p>
+    </div>
+
+    <!-- SHARE -->
+    <div class="card" style="border-color:#1a1a1a;text-align:center;">
+      <div class="section-label">Share the results</div>
+      <p style="font-size:0.85rem;color:#666;margin-bottom:1.25rem;">
+        Post this battle. Tag the loser.
+      </p>
+      <button class="btn-primary" onclick="shareResults()">
+        Share battle results →
+      </button>
+      <button class="btn-villain" onclick="startNewBattle()">
+        Start another battle →
+      </button>
+      <a href="leaderboard.html" class="btn-ghost">View leaderboard</a>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    const profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
+
+    let currentBattle = null;
+    let votesA = 0;
+    let votesB = 0;
+    let hasVoted = false;
+    let battleTimerInterval = null;
+
+    const SAMPLE_ROASTS = [
+      "Shows up to everything 30 minutes late then wonders why opportunities pass them by. Their LinkedIn says 'entrepreneur' but their bank account says 'ask mum'. The potential is there but it keeps getting postponed.",
+      "Talks about the gym every January and disappears by February. Their biggest flex is knowing people who are actually doing things. Deep down they know exactly what they need to do — they just keep choosing comfort.",
+      "Has a new business idea every week and a finished product never. The energy is there but the execution is on holiday. Their friends have stopped asking for updates because updates never come.",
+      "Genuinely talented but allergic to consistency. Could be running things by now if they stopped starting over. The comeback story is still being written — they just need to stop deleting the chapters."
+    ];
+
+    const OPEN_BATTLES = [
+      { id: 'b001', name: 'Tatenda M.', city: 'Harare', job: 'Entrepreneur', votes: 23, initials: 'T', status: 'open' },
+      { id: 'b002', name: 'Rudo C.', city: 'Bulawayo', job: 'Content Creator', votes: 0, initials: 'R', status: 'open' },
+    ];
+
+    const COMPLETED_BATTLES = [
+      { winner: 'Farai N.', loser: 'Blessing K.', votesW: 67, votesL: 33 },
+      { winner: 'Chipo S.', loser: 'Simba W.', votesW: 58, votesL: 42 }
+    ];
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    // ── LOBBY ──
+    function renderLobby() {
+      const openList = document.getElementById('open-battles-list');
+      const completedList = document.getElementById('completed-battles-list');
+
+      if (OPEN_BATTLES.length === 0) {
+        openList.innerHTML = `<div style="color:#333;font-size:0.85rem;padding:0.75rem 0;">No open battles right now. Start one!</div>`;
+      } else {
+        openList.innerHTML = '';
+        OPEN_BATTLES.forEach(b => {
+          openList.innerHTML += `
+            <div class="open-battle-card" onclick="joinBattle('${b.id}','${b.name}','${b.job}','${b.initials}')">
+              <div style="display:flex;align-items:center;gap:10px;flex:1;">
+                <div class="fighter-avatar" style="width:36px;height:36px;font-size:0.9rem;margin:0;">${b.initials}</div>
+                <div class="open-battle-info">
+                  <div class="open-battle-name">${b.name}</div>
+                  <div class="open-battle-meta">${b.job} • ${b.city}</div>
+                </div>
+              </div>
+              <div class="join-badge">Join battle →</div>
+            </div>`;
+        });
+      }
+
+      completedList.innerHTML = '';
+      COMPLETED_BATTLES.forEach(b => {
+        completedList.innerHTML += `
+          <div class="open-battle-card" style="cursor:default;">
+            <div class="open-battle-info">
+              <div class="open-battle-name">👑 ${b.winner} defeated ${b.loser}</div>
+              <div class="open-battle-meta">${b.votesW}% vs ${b.votesL}% of votes</div>
+            </div>
+            <div class="waiting-badge">Ended</div>
+          </div>`;
+      });
+    }
+
+    // ── CREATE BATTLE ──
+    function createBattle() {
+      if (!profile.name) {
+        alert('Create your profile first to start a battle.');
+        window.location.href = 'create.html';
+        return;
+      }
+
+      const battleId = 'battle_' + Date.now();
+      currentBattle = {
+        id: battleId,
+        playerA: {
+          name: profile.name,
+          job: profile.job || '',
+          initials: profile.name[0].toUpperCase(),
+          photo: profile.photo || null,
+          roast: SAMPLE_ROASTS[Math.floor(Math.random() * SAMPLE_ROASTS.length)]
+        },
+        playerB: null,
+        votesA: 0,
+        votesB: 0,
+        status: 'waiting'
+      };
+
+      localStorage.setItem('nfz_current_battle', JSON.stringify(currentBattle));
+
+      const handle = profile.name.toLowerCase().replace(/\s+/g, '');
+      document.getElementById('battle-share-url').textContent =
+        `nofilterzim.netlify.app/battle.html?join=${battleId}&challenger=${handle}`;
+
+      showScreen('screen-waiting');
+    }
+
+    function copyBattleLink() {
+      const url = document.getElementById('battle-share-url').textContent;
+      navigator.clipboard.writeText(url);
+      const el = document.getElementById('battle-copy-confirm');
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 2000);
+    }
+
+    function shareBattleLink() {
+      const url = document.getElementById('battle-share-url').textContent;
+      const text = `Who wants to battle me? 😈 First one to open this link is my opponent. Winner gets bragging rights.\n\n${url}`;
+      navigator.share ? navigator.share({ text }) : (navigator.clipboard.writeText(text), alert('Copied!'));
+    }
+
+    function cancelBattle() {
+      currentBattle = null;
+      localStorage.removeItem('nfz_current_battle');
+      showScreen('screen-lobby');
+    }
+
+    // ── JOIN BATTLE ──
+    function joinBattle(id, name, job, initials) {
+      const joinerName = profile.name || 'Anonymous';
+      const joinerJob = profile.job || 'Unknown';
+      const joinerInitials = profile.name ? profile.name[0].toUpperCase() : 'A';
+
+      currentBattle = {
+        id,
+        playerA: { name, job, initials, roast: SAMPLE_ROASTS[0] },
+        playerB: {
+          name: joinerName,
+          job: joinerJob,
+          initials: joinerInitials,
+          photo: profile.photo || null,
+          roast: SAMPLE_ROASTS[1]
+        },
+        votesA: 0,
+        votesB: 0,
+        status: 'active'
+      };
+
+      startActiveBattle();
+    }
+
+    function simulateOpponentJoin() {
+      const opponents = [
+        { name: 'Rudo C.', job: 'Content Creator', initials: 'R' },
+        { name: 'Farai N.', job: 'Software Dev', initials: 'F' },
+        { name: 'Blessing K.', job: 'Student', initials: 'B' }
+      ];
+      const opp = opponents[Math.floor(Math.random() * opponents.length)];
+
+      currentBattle.playerB = {
+        name: opp.name,
+        job: opp.job,
+        initials: opp.initials,
+        photo: null,
+        roast: SAMPLE_ROASTS[Math.floor(Math.random() * SAMPLE_ROASTS.length)]
+      };
+      currentBattle.status = 'active';
+      startActiveBattle();
+    }
+
+    // ── ACTIVE BATTLE ──
+    function startActiveBattle() {
+      const a = currentBattle.playerA;
+      const b = currentBattle.playerB;
+
+      // Set avatars
+      document.getElementById('avatar-a').textContent = a.initials;
+      document.getElementById('avatar-b').textContent = b.initials;
+      document.getElementById('name-a').textContent = a.name;
+      document.getElementById('name-b').textContent = b.name;
+      document.getElementById('meta-a').textContent = a.job;
+      document.getElementById('meta-b').textContent = b.job;
+      document.getElementById('label-a').textContent = a.name;
+      document.getElementById('label-b').textContent = b.name;
+      document.getElementById('roast-label-a').textContent = a.name;
+      document.getElementById('roast-label-b').textContent = b.name;
+      document.getElementById('full-roast-a').textContent = a.roast;
+      document.getElementById('full-roast-b').textContent = b.roast;
+
+      if (a.photo) {
+        document.getElementById('avatar-a').innerHTML = `<img src="${a.photo}" alt="${a.name}">`;
+      }
+      if (b.photo) {
+        document.getElementById('avatar-b').innerHTML = `<img src="${b.photo}" alt="${b.name}">`;
+      }
+
+      votesA = 0;
+      votesB = 0;
+      hasVoted = false;
+      updateVoteBar();
+      startBattleTimer();
+      showScreen('screen-battle');
+    }
+
+    function vote(side) {
+      if (hasVoted) return;
+      hasVoted = true;
+
+      if (side === 'a') {
+        votesA++;
+        document.getElementById('vote-btn-a').classList.add('voted');
+        document.getElementById('fighter-a').classList.add('voted');
+      } else {
+        votesB++;
+        document.getElementById('vote-btn-b').classList.add('voted');
+        document.getElementById('fighter-b').classList.add('voted');
+      }
+
+      document.getElementById('vote-btn-a').disabled = true;
+      document.getElementById('vote-btn-b').disabled = true;
+      document.getElementById('voted-msg').style.display = 'block';
+
+      updateVoteBar();
+    }
+
+    function updateVoteBar() {
+      const total = votesA + votesB;
+      const pctA = total === 0 ? 50 : Math.round((votesA / total) * 100);
+      const pctB = 100 - pctA;
+
+      document.getElementById('bar-a').style.width = pctA + '%';
+      document.getElementById('bar-b').style.width = pctB + '%';
+      document.getElementById('count-a').textContent = votesA;
+      document.getElementById('count-b').textContent = votesB;
+      document.getElementById('pct-a').textContent = pctA + '%';
+      document.getElementById('pct-b').textContent = pctB + '%';
+    }
+
+    function simulateVotes() {
+      const newA = Math.floor(Math.random() * 30) + 10;
+      const newB = Math.floor(Math.random() * 30) + 10;
+      votesA += newA;
+      votesB += newB;
+      updateVoteBar();
+    }
+
+    function startBattleTimer() {
+      const duration = 24 * 60 * 60;
+      let remaining = duration;
+
+      if (battleTimerInterval) clearInterval(battleTimerInterval);
+
+      battleTimerInterval = setInterval(() => {
+        remaining--;
+        const h = Math.floor(remaining / 3600);
+        const m = Math.floor((remaining % 3600) / 60);
+        const s = remaining % 60;
+        document.getElementById('battle-timer').textContent =
+          `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if (remaining <= 0) {
+          clearInterval(battleTimerInterval);
+          endBattle();
+        }
+      }, 1000);
+    }
+
+    function endBattle() {
+      clearInterval(battleTimerInterval);
+
+      const a = currentBattle.playerA;
+      const b = currentBattle.playerB;
+      const aWins = votesA >= votesB;
+
+      const winner = aWins ? a : b;
+      const loser = aWins ? b : a;
+      const winnerVotes = aWins ? votesA : votesB;
+      const loserVotes = aWins ? votesB : votesA;
+      const total = winnerVotes + loserVotes;
+      const winPct = total === 0 ? 50 : Math.round((winnerVotes / total) * 100);
+
+      document.getElementById('winner-name').textContent = winner.name;
+      document.getElementById('winner-meta').textContent =
+        `Won with ${winPct}% of the vote`;
+
+      document.getElementById('result-name-a').textContent = a.name;
+      document.getElementById('result-name-b').textContent = b.name;
+      document.getElementById('result-votes-a').textContent = votesA;
+      document.getElementById('result-votes-b').textContent = votesB;
+      document.getElementById('result-avatar-a').textContent = a.initials;
+      document.getElementById('result-avatar-b').textContent = b.initials;
+
+      if (aWins) {
+        document.getElementById('result-card-a').className = 'fighter-card winner';
+        document.getElementById('result-card-b').className = 'fighter-card loser';
+      } else {
+        document.getElementById('result-card-a').className = 'fighter-card loser';
+        document.getElementById('result-card-b').className = 'fighter-card winner';
+      }
+
+      document.getElementById('loser-shame-text').textContent =
+        `${loser.name} took the L with ${loserVotes} votes (${100 - winPct}%). ` +
+        `This loss has been recorded on the No Filter Zim leaderboard. ` +
+        `The only way out is to challenge someone else and win.`;
+
+      // Record loss on leaderboard
+      const leaderboard = JSON.parse(localStorage.getItem('nfz_leaderboard') || '[]');
+      const loserEntry = leaderboard.find(e => e.name === loser.name);
+      if (loserEntry) {
+        loserEntry.losses = (loserEntry.losses || 0) + 1;
+        localStorage.setItem('nfz_leaderboard', JSON.stringify(leaderboard));
+      }
+
+      COMPLETED_BATTLES.unshift({
+        winner: winner.name,
+        loser: loser.name,
+        votesW: winPct,
+        votesL: 100 - winPct
+      });
+
+      showScreen('screen-results');
+    }
+
+    function shareResults() {
+      const winner = document.getElementById('winner-name').textContent;
+      const a = currentBattle.playerA;
+      const b = currentBattle.playerB;
+      const total = votesA + votesB;
+      const pctA = total === 0 ? 50 : Math.round((votesA / total) * 100);
+      const text = `🎭 Roast Battle Results\n\n👑 ${winner} WINS\n\n${a.name}: ${votesA} votes (${pctA}%)\n${b.name}: ${votesB} votes (${100 - pctA}%)\n\nStart your own battle → nofilterzim.netlify.app/battle.html`;
+      navigator.share ? navigator.share({ text }) : (navigator.clipboard.writeText(text), alert('Copied!'));
+    }
+
+    function startNewBattle() {
+      currentBattle = null;
+      votesA = 0;
+      votesB = 0;
+      hasVoted = false;
+      showScreen('screen-lobby');
+      renderLobby();
+    }
+
+    // Init
+    renderLobby();
+  </script>
+
+</body>
+</html>

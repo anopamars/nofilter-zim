@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Your Roast — No Filter Zim</title>
   <link rel="stylesheet" href="style.css">
-  <script src="config.js"></script>
   <style>
-    /* COUNTDOWN */
     .countdown-screen {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -39,12 +37,9 @@
       0% { transform: scale(1.6); opacity: 0; }
       100% { transform: scale(1); opacity: 1; }
     }
-
-    /* TYPEWRITER */
     .typewriter { border-right: 2px solid var(--red); animation: blink 0.7s infinite; }
-    @keyframes blink { 0%,100%{ border-color: var(--red); } 50%{ border-color: transparent; } }
+    @keyframes blink { 0%,100%{ border-color:var(--red); } 50%{ border-color:transparent; } }
 
-    /* PLAYLIST */
     .playlist-card {
       background: #050510;
       border: 1px solid #1a1a3a;
@@ -100,8 +95,6 @@
       border-radius: 20px;
       padding: 3px 10px;
     }
-
-    /* VILLAIN */
     .mission-header {
       display: flex;
       align-items: center;
@@ -119,8 +112,6 @@
       padding: 4px 12px;
       border-radius: 20px;
     }
-
-    /* SHARE */
     .share-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -139,7 +130,6 @@
     .share-option:hover { border-color: #444; }
     .share-option .icon { font-size: 1.4rem; margin-bottom: 6px; }
     .share-option .label { font-size: 0.78rem; color: #777; }
-
     .results-wrap { display: none; }
   </style>
 </head>
@@ -176,7 +166,6 @@
       Based on <span id="response-count-display">0</span> anonymous responses
     </p>
 
-    <!-- PROFILE SNAPSHOT -->
     <div class="card" style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
       <div id="snap-avatar"></div>
       <div>
@@ -185,19 +174,16 @@
       </div>
     </div>
 
-    <!-- ROAST -->
     <div class="roast-card">
       <div class="section-label">🔥 the roast</div>
       <p id="roast-content" style="color:#ddd;line-height:1.9;font-size:0.95rem;"></p>
     </div>
 
-    <!-- ADVICE -->
     <div class="advice-card">
       <div class="section-label" style="color:#4a9;">💡 real talk</div>
       <p id="advice-content" style="color:#aaa;line-height:1.8;font-size:0.92rem;"></p>
     </div>
 
-    <!-- VILLAIN ARC -->
     <div class="villain-card">
       <div class="mission-header">
         <div class="section-label" style="margin-bottom:0;color:#9b5fff;">⚡ villain arc</div>
@@ -209,7 +195,6 @@
       <div id="villain-steps"></div>
     </div>
 
-    <!-- PLAYLIST -->
     <div class="playlist-card">
       <div class="section-label" style="color:#7b5fff;">🎵 your roast playlist</div>
       <div class="mood-bar">
@@ -222,7 +207,6 @@
       <div id="song-list"></div>
     </div>
 
-    <!-- SHARE -->
     <div class="card" style="border-color:#1a1a1a;">
       <div class="section-label" style="text-align:center;">Share your results</div>
       <p style="font-size:0.85rem;margin-bottom:1.25rem;text-align:center;">
@@ -265,7 +249,6 @@
     let villainSteps = [];
     let playlistData = null;
 
-    // ── COUNTDOWN ──
     function runCountdown() {
       const numEl = document.getElementById('countdown-num');
       const labelEl = document.getElementById('countdown-label');
@@ -294,7 +277,6 @@
       }, 900);
     }
 
-    // ── LOADING MESSAGES ──
     const loadingMessages = [
       { title: 'Reading the responses...', sub: 'People were not gentle.' },
       { title: 'Finding the patterns...', sub: 'There are some recurring themes.' },
@@ -313,7 +295,6 @@
       }, 2200);
     }
 
-    // ── TYPEWRITER ──
     function typewrite(el, text, speed = 18) {
       return new Promise(resolve => {
         el.textContent = '';
@@ -331,14 +312,13 @@
       });
     }
 
-    // ── GENERATE ──
     async function generateRoast() {
       startLoadingMessages();
 
       const answersText = answers.length > 0
         ? answers.map((a, i) => {
             if (a.type === 'image') return `Response ${i + 1} (photo roast): "${a.text}"`;
-            return `Response ${i + 1}: "${a.text}"`;
+            return `Response ${i + 1}: "${a.text || a}"`;
           }).join('\n')
         : `People said ${profile.name} is inconsistent, overconfident about their ${profile.good || 'skills'}, and their ${profile.rel} situation raises questions.`;
 
@@ -349,9 +329,12 @@ The person being roasted:
 - Age: ${profile.age}
 - Job/hustle: ${profile.job}
 - Relationship status: ${profile.rel}
+- City: ${profile.city || 'Zimbabwe'}
 - Thinks they are great at: ${profile.good || 'not specified'}
 - Currently working on: ${profile.working || 'not specified'}
 - Their biggest flex: ${profile.flex || 'not specified'}
+- Their biggest insecurity: ${profile.insecurity || 'not specified'}
+- Goal they keep avoiding: ${profile.goal || 'not specified'}
 
 Anonymous responses from people who know them:
 ${answersText}
@@ -399,27 +382,37 @@ SONG5_ARTIST: [artist]
 SONG5_VIBE: [vibe]`;
 
       try {
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${CONFIG.OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            max_tokens: 1500,
-            messages: [
-              { role: 'system', content: 'You are a brutally honest roast generator for a Zimbabwean social app. Be culturally relevant, funny, and sharp.' },
-              { role: 'user', content: prompt }
-            ]
-          })
-        });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
 
+        let res;
+        try {
+          res = await fetch('/.netlify/functions/roast', {
+            method: 'POST',
+            signal: controller.signal,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt })
+          });
+        } catch (fetchError) {
+          clearTimeout(timeout);
+          if (fetchError.name === 'AbortError') {
+            document.getElementById('loading-title').textContent = 'Taking too long...';
+            document.getElementById('loading-sub').textContent = 'Retrying once more...';
+            res = await fetch('/.netlify/functions/roast', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ prompt })
+            });
+          } else {
+            throw fetchError;
+          }
+        }
+
+        clearTimeout(timeout);
         const data = await res.json();
         clearInterval(msgInterval);
         const text = data.choices?.[0]?.message?.content || '';
 
-        // Parse sections
         const roastMatch = text.match(/ROAST:\s*([\s\S]*?)(?=ADVICE:)/i);
         const adviceMatch = text.match(/ADVICE:\s*([\s\S]*?)(?=VILLAIN_ARC:)/i);
         const s1t = text.match(/STEP1_TITLE:\s*(.+)/i);
@@ -462,11 +455,30 @@ SONG5_VIBE: [vibe]`;
           songs
         };
 
+        // Save roast score to leaderboard
+        const roastScore = parseFloat((Math.random() * 3 + 5).toFixed(1));
+        localStorage.setItem('nfz_roast_score', roastScore);
+        const existing = JSON.parse(localStorage.getItem('nfz_leaderboard') || '[]');
+        const myEntry = {
+          name: profile.name,
+          city: profile.city || 'Harare',
+          job: profile.job || '',
+          responses: responseCount,
+          score: roastScore,
+          arc: 'Active',
+          initials: profile.name[0].toUpperCase(),
+          photo: profile.photo || null,
+          isMe: true
+        };
+        const filtered = existing.filter(e => !e.isMe);
+        filtered.push(myEntry);
+        localStorage.setItem('nfz_leaderboard', JSON.stringify(filtered));
+
         await showResults();
 
       } catch (e) {
         clearInterval(msgInterval);
-        roastText = `${profile.name}, even the AI could not roast you today — but your wifi situation definitely needs roasting. Try again.`;
+        roastText = `${profile.name}, the AI couldn't roast you today — but your wifi situation definitely needs roasting. Try again.`;
         adviceText = 'Fix your connection. Then come back and face the music.';
         villainSteps = [
           { title: 'Fix your wifi first', action: 'The villain arc starts with a stable connection. Come back when you are ready.' },

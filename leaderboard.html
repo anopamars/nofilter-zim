@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zim Leaderboard — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .city-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.5rem;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .city-tab {
+      background: #111;
+      border: 0.5px solid #222;
+      border-radius: 20px;
+      padding: 8px 18px;
+      font-size: 0.82rem;
+      color: #666;
+      cursor: pointer;
+      white-space: nowrap;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .city-tab:hover { border-color: #444; color: #aaa; }
+    .city-tab.active {
+      background: var(--red);
+      border-color: var(--red);
+      color: white;
+      font-weight: 500;
+    }
+
+    .leaderboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .rank-card {
+      background: #111;
+      border: 0.5px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      transition: border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .rank-card:hover { border-color: #333; }
+    .rank-card.top-1 {
+      background: #120a00;
+      border-color: #c8a84b;
+    }
+    .rank-card.top-2 {
+      background: #0a0a12;
+      border-color: #888;
+    }
+    .rank-card.top-3 {
+      background: #0a0800;
+      border-color: #a05c20;
+    }
+    .rank-card.is-me {
+      border-color: var(--red);
+      background: #0a0000;
+    }
+    .rank-card.is-me::before {
+      content: 'YOU';
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 0.65rem;
+      color: var(--red);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+    }
+
+    .rank-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      min-width: 36px;
+      text-align: center;
+      line-height: 1;
+    }
+    .rank-num.gold { color: #c8a84b; }
+    .rank-num.silver { color: #888; }
+    .rank-num.bronze { color: #a05c20; }
+    .rank-num.normal { color: #333; }
+
+    .rank-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .rank-avatar-initials {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #666;
+      flex-shrink: 0;
+    }
+    .rank-avatar-initials.top { background: var(--red); color: white; }
+
+    .rank-info { flex: 1; min-width: 0; }
+    .rank-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .rank-meta {
+      font-size: 0.75rem;
+      color: #555;
+      margin-top: 2px;
+    }
+    .rank-pills {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+    .rank-pill {
+      background: #1a1a1a;
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      color: #666;
+    }
+
+    .rank-score {
+      text-align: right;
+      flex-shrink: 0;
+    }
+    .score-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      line-height: 1;
+      color: var(--white);
+    }
+    .score-label {
+      font-size: 0.68rem;
+      color: #444;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    .score-bar {
+      width: 48px;
+      height: 3px;
+      background: #1a1a1a;
+      border-radius: 2px;
+      margin-top: 6px;
+      margin-left: auto;
+    }
+    .score-bar-fill {
+      height: 100%;
+      background: var(--red);
+      border-radius: 2px;
+    }
+
+    .my-rank-banner {
+      background: #0a0000;
+      border: 1px solid var(--red);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .my-rank-label { font-size: 0.78rem; color: #666; }
+    .my-rank-num {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.8rem;
+      color: var(--red);
+      line-height: 1;
+    }
+    .my-rank-city { font-size: 0.78rem; color: #555; margin-top: 2px; }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 0;
+      color: #444;
+    }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+
+    .refresh-btn {
+      background: none;
+      border: 0.5px solid #222;
+      color: #555;
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+    .refresh-btn:hover { border-color: #444; color: #aaa; }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: #3a3;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      animation: livePulse 2s infinite;
+    }
+    @keyframes livePulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .category-scores {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .cat-box {
+      background: #111;
+      border: 0.5px solid #1a1a1a;
+      border-radius: 6px;
+      padding: 0.75rem 0.5rem;
+      text-align: center;
+    }
+    .cat-score {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.3rem;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .cat-label {
+      font-size: 0.65rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="nav-back">← home</a>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+    <h2 style="margin-bottom:0;">🏆 Zim Leaderboard</h2>
+    <button class="refresh-btn" onclick="loadLeaderboard()">↻ Refresh</button>
+  </div>
+  <p class="muted" style="font-size:0.82rem;margin-bottom:1.5rem;">
+    <span class="live-dot"></span>Most roasted people in Zimbabwe right now
+  </p>
+
+  <!-- CITY TABS -->
+  <div class="city-tabs">
+    <div class="city-tab active" onclick="switchCity('all', this)">🇿🇼 All Zim</div>
+    <div class="city-tab" onclick="switchCity('Harare', this)">Harare</div>
+    <div class="city-tab" onclick="switchCity('Bulawayo', this)">Bulawayo</div>
+    <div class="city-tab" onclick="switchCity('Mutare', this)">Mutare</div>
+    <div class="city-tab" onclick="switchCity('Gweru', this)">Gweru</div>
+    <div class="city-tab" onclick="switchCity('Masvingo', this)">Masvingo</div>
+  </div>
+
+  <!-- MY RANK BANNER -->
+  <div class="my-rank-banner" id="my-rank-banner" style="display:none;">
+    <div>
+      <div class="my-rank-label">Your current rank</div>
+      <div class="my-rank-num" id="my-rank-num">#—</div>
+      <div class="my-rank-city" id="my-rank-city"></div>
+    </div>
+    <div style="text-align:right;">
+      <div style="font-size:0.78rem;color:#666;margin-bottom:4px;">Your score</div>
+      <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.8rem;color:var(--white);" id="my-score-display">—</div>
+      <div style="font-size:0.7rem;color:#444;">/10</div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div id="leaderboard-list"></div>
+
+  <!-- ADD ME TO LEADERBOARD -->
+  <div id="join-section"></div>
+
+  <script src="app.js"></script>
+  <script>
+    let currentCity = 'all';
+    let leaderboardData = [];
+
+    // Seed data — realistic Zim profiles
+    const SEED_DATA = [
+      { name: 'Tatenda M.', city: 'Harare', job: 'Entrepreneur', responses: 47, score: 8.2, arc: 'Active', initials: 'T' },
+      { name: 'Rudo C.', city: 'Bulawayo', job: 'Content Creator', responses: 38, score: 7.9, arc: 'Active', initials: 'R' },
+      { name: 'Farai N.', city: 'Harare', job: 'Software Dev', responses: 31, score: 7.4, arc: 'Complete', initials: 'F' },
+      { name: 'Blessing K.', city: 'Mutare', job: 'Student', responses: 29, score: 7.1, arc: 'Active', initials: 'B' },
+      { name: 'Tinashe P.', city: 'Gweru', job: 'Nurse', responses: 24, score: 6.8, arc: 'Active', initials: 'T' },
+      { name: 'Chipo S.', city: 'Harare', job: 'Lawyer', responses: 22, score: 6.5, arc: 'Pending', initials: 'C' },
+      { name: 'Munashe D.', city: 'Bulawayo', job: 'Teacher', responses: 19, score: 6.2, arc: 'Active', initials: 'M' },
+      { name: 'Nyasha T.', city: 'Masvingo', job: 'Accountant', responses: 17, score: 5.9, arc: 'Pending', initials: 'N' },
+      { name: 'Simba W.', city: 'Harare', job: 'DJ', responses: 15, score: 5.6, arc: 'Active', initials: 'S' },
+      { name: 'Rutendo M.', city: 'Mutare', job: 'Designer', responses: 12, score: 5.2, arc: 'Pending', initials: 'R' }
+    ];
+
+    function getLeaderboardData() {
+      const stored = localStorage.getItem('nfz_leaderboard');
+      let data = stored ? JSON.parse(stored) : [];
+
+      // Merge with seed data — seed entries wont duplicate
+      const names = data.map(d => d.name);
+      SEED_DATA.forEach(s => {
+        if (!names.includes(s.name)) data.push(s);
+      });
+
+      // Sort by score descending
+      return data.sort((a, b) => b.score - a.score);
+    }
+
+    function getMyEntry() {
+      const profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
+      const responses = parseInt(localStorage.getItem('nfz_response_count') || '0');
+      if (!profile.name || responses < 3) return null;
+
+      const score = parseFloat(localStorage.getItem('nfz_roast_score') || '0');
+      if (!score) return null;
+
+      return {
+        name: profile.name,
+        city: profile.city || 'Harare',
+        job: profile.job || '',
+        responses,
+        score,
+        arc: 'Active',
+        initials: profile.name[0].toUpperCase(),
+        photo: profile.photo,
+        isMe: true
+      };
+    }
+
+    function switchCity(city, el) {
+      currentCity = city;
+      document.querySelectorAll('.city-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      renderLeaderboard();
+    }
+
+    function loadLeaderboard() {
+      leaderboardData = getLeaderboardData();
+      const myEntry = getMyEntry();
+      if (myEntry) {
+        const exists = leaderboardData.find(d => d.isMe);
+        if (!exists) leaderboardData.push(myEntry);
+        leaderboardData.sort((a, b) => b.score - a.score);
+      }
+      renderLeaderboard();
+    }
+
+    function renderLeaderboard() {
+      const list = document.getElementById('leaderboard-list');
+      const myRankBanner = document.getElementById('my-rank-banner');
+      const joinSection = document.getElementById('join-section');
+
+      let filtered = currentCity === 'all'
+        ? leaderboardData
+        : leaderboardData.filter(d => d.city === currentCity);
+
+      // My rank
+      const myEntry = filtered.find(d => d.isMe);
+      const myRank = myEntry ? filtered.indexOf(myEntry) + 1 : null;
+
+      if (myEntry && myRank) {
+        myRankBanner.style.display = 'flex';
+        document.getElementById('my-rank-num').textContent = `#${myRank}`;
+        document.getElementById('my-rank-city').textContent = `in ${currentCity === 'all' ? 'Zimbabwe' : currentCity}`;
+        document.getElementById('my-score-display').textContent = myEntry.score.toFixed(1);
+      } else {
+        myRankBanner.style.display = 'none';
+      }
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <span class="empty-icon">🏙️</span>
+            <div style="font-size:0.9rem;margin-bottom:0.5rem;">No one from ${currentCity} yet</div>
+            <div style="font-size:0.8rem;">Be the first to represent your city</div>
+          </div>`;
+        renderJoinSection(joinSection);
+        return;
+      }
+
+      list.innerHTML = '';
+      filtered.forEach((entry, index) => {
+        const rank = index + 1;
+        const rankClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
+        const numClass = rank === 1 ? 'gold' : rank === 2 ? 'silver' : rank === 3 ? 'bronze' : 'normal';
+        const rankEmoji = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+        const isTop = rank <= 3;
+
+        const avatarHTML = entry.photo
+          ? `<img src="${entry.photo}" class="rank-avatar" alt="${entry.name}">`
+          : `<div class="rank-avatar-initials ${isTop ? 'top' : ''}">${entry.initials}</div>`;
+
+        const arcColor = entry.arc === 'Active' ? '#9b5fff' : entry.arc === 'Complete' ? '#4a9' : '#555';
+
+        const div = document.createElement('div');
+        div.className = `rank-card ${rankClass} ${entry.isMe ? 'is-me' : ''}`;
+        div.innerHTML = `
+          <div class="rank-num ${numClass}">${rankEmoji}</div>
+          ${avatarHTML}
+          <div class="rank-info">
+            <div class="rank-name">${entry.name}</div>
+            <div class="rank-meta">${entry.job} • ${entry.city}</div>
+            <div class="rank-pills">
+              <span class="rank-pill">${entry.responses} responses</span>
+              <span class="rank-pill" style="color:${arcColor};">⚡ Arc ${entry.arc}</span>
+            </div>
+          </div>
+          <div class="rank-score">
+            <div class="score-num">${entry.score.toFixed(1)}</div>
+            <div class="score-label">/10</div>
+            <div class="score-bar">
+              <div class="score-bar-fill" style="width:${entry.score * 10}%"></div>
+            </div>
+          </div>`;
+        list.appendChild(div);
+      });
+
+      renderJoinSection(joinSection);
+    }
+
+    function renderJoinSection(el) {
+      const profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
+      const responses = parseInt(localStorage.getItem('nfz_response_count') || '0');
+      const score = parseFloat(localStorage.getItem('nfz_roast_score') || '0');
+      const myEntry = leaderboardData.find(d => d.isMe);
+
+      if (myEntry) {
+        el.innerHTML = `
+          <div class="card" style="border-color:#1a1a1a;text-align:center;margin-top:1rem;">
+            <div class="section-label">You are on the board</div>
+            <p style="font-size:0.85rem;color:#666;margin-bottom:1rem;">
+              Share your roast to climb the rankings.
+              More responses = higher score.
+            </p>
+            <a href="profile.html" class="btn-primary">Back to my profile →</a>
+          </div>`;
+      } else if (!profile.name) {
+        el.innerHTML = `
+          <div class="card" style="border-color:#1a1a1a;text-align:center;margin-top:1rem;">
+            <div class="section-label">Want to be on this list?</div>
+            <p style="font-size:0.85rem;color:#666;margin-bottom:1rem;">
+              Create your profile, get roasted, and join the leaderboard.
+            </p>
+            <a href="create.html" class="btn-primary">Create my profile →</a>
+          </div>`;
+      } else if (responses < 3) {
+        el.innerHTML = `
+          <div class="card" style="border-color:#1a1a1a;text-align:center;margin-top:1rem;">
+            <div class="section-label">Almost on the board</div>
+            <p style="font-size:0.85rem;color:#666;margin-bottom:1rem;">
+              You need at least 3 responses and a generated roast to join the leaderboard.
+            </p>
+            <a href="profile.html" class="btn-primary">Get more responses →</a>
+          </div>`;
+      } else if (!score) {
+        el.innerHTML = `
+          <div class="card" style="border-color:#1a1a1a;text-align:center;margin-top:1rem;">
+            <div class="section-label">Generate your roast to join</div>
+            <p style="font-size:0.85rem;color:#666;margin-bottom:1rem;">
+              You have ${responses} responses. Generate your roast to get your score and join the leaderboard.
+            </p>
+            <a href="roast.html" class="btn-primary">Generate my roast →</a>
+          </div>`;
+      }
+    }
+
+    loadLeaderboard();
+  </script>
+
+</body>
+</html>

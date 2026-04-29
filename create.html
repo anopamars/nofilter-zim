@@ -205,6 +205,21 @@
       <option>Divorced</option>
     </select>
   </div>
+  <div class="input-group">
+  <label class="input-label">Your city *</label>
+  <select id="inp-city" class="nf-input">
+    <option value="">Select your city...</option>
+    <option>Harare</option>
+    <option>Bulawayo</option>
+    <option>Mutare</option>
+    <option>Gweru</option>
+    <option>Masvingo</option>
+    <option>Kwekwe</option>
+    <option>Kadoma</option>
+    <option>Chinhoyi</option>
+    <option>Other</option>
+  </select>
+</div>
 
   <!-- ROAST FUEL -->
   <div class="form-section-title">Roast fuel</div>
@@ -356,6 +371,8 @@
       const insecurity = document.getElementById('inp-insecurity').value.trim();
       const goal = document.getElementById('inp-goal').value.trim();
       const err = document.getElementById('form-error');
+      const city = document.getElementById('inp-city').value;
+
 
       if (!name || !age || !job || !rel) {
         err.style.display = 'block';
@@ -373,7 +390,7 @@
 
       const profile = {
         name, age, job, rel,
-        good, working, flex,
+        good, city, working, flex,
         insecurity, goal,
         photo: photoData
       };
