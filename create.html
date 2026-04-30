@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Profile — No Filter Zim</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <style>
     .photo-section {
       display: flex;
@@ -61,8 +63,6 @@
       transition: border-color 0.15s, color 0.15s;
     }
     .photo-btn:hover { border-color: var(--red); color: var(--white); }
-
-    /* Camera modal */
     .camera-modal {
       display: none;
       position: fixed;
@@ -89,14 +89,12 @@
       width: 100%;
       max-width: 340px;
     }
-
     .char-count {
       font-size: 0.72rem;
       color: #555;
       text-align: right;
       margin-top: 4px;
     }
-
     .step-indicator {
       display: flex;
       align-items: center;
@@ -108,10 +106,9 @@
       height: 8px;
       border-radius: 50%;
       background: #222;
+      transition: background 0.3s;
     }
     .step-dot.active { background: var(--red); }
-    .step-dot.done { background: #444; }
-
     .form-section-title {
       font-family: 'Syne', sans-serif;
       font-weight: 700;
@@ -124,6 +121,25 @@
       padding-bottom: 0.5rem;
       border-bottom: 0.5px solid #1a1a1a;
     }
+    .saving-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 200;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .saving-overlay.show { display: flex; }
+    .saving-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+    }
+    .saving-sub { color: #555; font-size: 0.88rem; }
   </style>
 </head>
 <body>
@@ -138,9 +154,9 @@
 
   <div class="section-label">Step 1 of 2</div>
   <h2>Set up your profile</h2>
-  <p style="margin-bottom:2rem;color:#666;">
+  <p style="margin-bottom:2rem;color:#666;line-height:1.6;">
     Tell people enough to roast you properly.
-    The more honest you are, the better the roast.
+    The more honest you are the better the roast.
   </p>
 
   <!-- PHOTO -->
@@ -205,26 +221,29 @@
       <option>Divorced</option>
     </select>
   </div>
+
   <div class="input-group">
-  <label class="input-label">Your city *</label>
-  <select id="inp-city" class="nf-input">
-    <option value="">Select your city...</option>
-    <option>Harare</option>
-    <option>Bulawayo</option>
-    <option>Mutare</option>
-    <option>Gweru</option>
-    <option>Masvingo</option>
-    <option>Kwekwe</option>
-    <option>Kadoma</option>
-    <option>Chinhoyi</option>
-    <option>Other</option>
-  </select>
-</div>
+    <label class="input-label">Your city *</label>
+    <select id="inp-city" class="nf-input">
+      <option value="">Select your city...</option>
+      <option>Harare</option>
+      <option>Bulawayo</option>
+      <option>Mutare</option>
+      <option>Gweru</option>
+      <option>Masvingo</option>
+      <option>Kwekwe</option>
+      <option>Kadoma</option>
+      <option>Chinhoyi</option>
+      <option>Victoria Falls</option>
+      <option>Other</option>
+    </select>
+  </div>
 
   <!-- ROAST FUEL -->
   <div class="form-section-title">Roast fuel</div>
   <p style="color:#555;font-size:0.82rem;margin-bottom:1.25rem;line-height:1.6;">
-    This is what people will roast you on. Be honest — the more specific, the better the roast.
+    This is what people will roast you on.
+    Be honest — the more specific the better the roast.
   </p>
 
   <div class="input-group">
@@ -278,7 +297,7 @@
 
   <div class="spacer"></div>
 
-  <button class="btn-primary" onclick="saveProfile()">
+  <button class="btn-primary" id="save-btn" onclick="saveProfile()">
     Generate my link →
   </button>
 
@@ -286,6 +305,17 @@
     Your profile is only shared when you share your link.<br>
     Responses are always 100% anonymous.
   </p>
+
+  <!-- SAVING OVERLAY -->
+  <div class="saving-overlay" id="saving-overlay">
+    <div class="dots" style="justify-content:center;margin-bottom:1.5rem;">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div class="saving-title">Creating your profile...</div>
+    <div class="saving-sub">This will only take a second</div>
+  </div>
 
   <!-- CAMERA MODAL -->
   <div class="camera-modal" id="camera-modal">
@@ -303,6 +333,9 @@
 
   <script src="app.js"></script>
   <script>
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     let photoData = null;
     let stream = null;
 
@@ -331,9 +364,7 @@
 
     async function openCamera() {
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: 'user' }
-        });
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
         document.getElementById('camera-video').srcObject = stream;
         document.getElementById('camera-modal').classList.add('open');
       } catch (e) {
@@ -347,56 +378,92 @@
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0);
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      setPhoto(dataUrl);
+      setPhoto(canvas.toDataURL('image/jpeg', 0.8));
       closeCamera();
     }
 
     function closeCamera() {
-      if (stream) {
-        stream.getTracks().forEach(t => t.stop());
-        stream = null;
-      }
+      if (stream) { stream.getTracks().forEach(t => t.stop()); stream = null; }
       document.getElementById('camera-modal').classList.remove('open');
     }
 
-    function saveProfile() {
+    async function saveProfile() {
       const name = document.getElementById('inp-name').value.trim();
       const age = document.getElementById('inp-age').value.trim();
       const job = document.getElementById('inp-job').value.trim();
       const rel = document.getElementById('inp-rel').value;
+      const city = document.getElementById('inp-city').value;
       const good = document.getElementById('inp-good').value.trim();
       const working = document.getElementById('inp-working').value.trim();
       const flex = document.getElementById('inp-flex').value.trim();
       const insecurity = document.getElementById('inp-insecurity').value.trim();
       const goal = document.getElementById('inp-goal').value.trim();
       const err = document.getElementById('form-error');
-      const city = document.getElementById('inp-city').value;
 
-
-      if (!name || !age || !job || !rel) {
+      if (!name || !age || !job || !rel || !city) {
         err.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
 
       err.style.display = 'none';
+      document.getElementById('saving-overlay').classList.add('show');
 
-      // Clear any old data from previous profile
+      // Generate unique handle
+      const handle = name.toLowerCase().replace(/\s+/g, '') + '_' + Date.now();
+
+      // Clear old local data
       localStorage.removeItem('nfz_expires_at');
       localStorage.removeItem('nfz_response_count');
       localStorage.removeItem('nfz_answers');
       localStorage.removeItem('nfz_views');
+      localStorage.removeItem('nfz_roast_score');
+      localStorage.removeItem('nfz_profile_id');
 
-      const profile = {
-        name, age, job, rel,
-        good, city, working, flex,
-        insecurity, goal,
-        photo: photoData
+      const profileData = {
+        name,
+        age,
+        job,
+        rel,
+        city,
+        good,
+        working,
+        flex,
+        insecurity,
+        goal,
+        photo: photoData,
+        handle,
+        response_count: 0,
+        roast_score: 0
       };
 
-      localStorage.setItem('nfz_profile', JSON.stringify(profile));
-      window.location.href = 'profile.html';
+      try {
+        const { data, error } = await db
+          .from('profiles')
+          .insert(profileData)
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        // Save to localStorage
+        localStorage.setItem('nfz_profile', JSON.stringify({
+          ...profileData,
+          id: data.id
+        }));
+        localStorage.setItem('nfz_profile_id', data.id);
+
+        document.getElementById('saving-overlay').classList.remove('show');
+        window.location.href = 'profile.html';
+
+      } catch (error) {
+        console.error('Error saving profile:', error);
+        document.getElementById('saving-overlay').classList.remove('show');
+
+        // Fall back to localStorage
+        localStorage.setItem('nfz_profile', JSON.stringify(profileData));
+        window.location.href = 'profile.html';
+      }
     }
   </script>
 

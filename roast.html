@@ -387,7 +387,7 @@ SONG5_VIBE: [vibe]`;
 
         let res;
         try {
-          res = await fetch('/.netlify/functions/roast', {
+          res = await fetch('/api/roast', {
             method: 'POST',
             signal: controller.signal,
             headers: { 'Content-Type': 'application/json' },

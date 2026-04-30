@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Profile — No Filter Zim</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
   <style>
     .photo-avatar {
       width: 64px;
@@ -95,8 +97,6 @@
       margin-top: 2px;
     }
     .preview-arrow { color: #444; font-size: 1.2rem; }
-
-    /* TIMER STYLES */
     .timer-box {
       background: #0a0000;
       border: 1px solid var(--red);
@@ -130,14 +130,8 @@
       margin-bottom: 0.5rem;
     }
     .timer-display.urgent { color: var(--red); animation: urgentPulse 1s infinite; }
-    @keyframes urgentPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    .timer-sub {
-      font-size: 0.8rem;
-      color: #555;
-    }
+    @keyframes urgentPulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+    .timer-sub { font-size: 0.8rem; color: #555; }
     .timer-progress {
       background: #1a0000;
       border-radius: 2px;
@@ -150,7 +144,6 @@
       border-radius: 2px;
       transition: width 1s linear;
     }
-
     .expired-box {
       background: #0a0a0a;
       border: 0.5px solid #222;
@@ -159,7 +152,6 @@
       text-align: center;
       margin-bottom: 1.25rem;
     }
-
     .activate-box {
       background: #050510;
       border: 1px solid var(--purple);
@@ -177,18 +169,10 @@
       height: 2px;
       background: var(--purple);
     }
-    .activate-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
+    .loading-pulse {
+      animation: loadPulse 1.5s infinite;
     }
-    .activate-sub {
-      color: #666;
-      font-size: 0.85rem;
-      margin-bottom: 1.25rem;
-      line-height: 1.6;
-    }
+    @keyframes loadPulse { 0%,100%{opacity:0.3;} 50%{opacity:1;} }
   </style>
 </head>
 <body>
@@ -199,8 +183,10 @@
 
   <!-- PROFILE CARD -->
   <div class="card" id="profile-card">
-    <div id="avatar-wrap"></div>
-    <h2 id="profile-name">Loading...</h2>
+    <div id="avatar-wrap">
+      <div class="initials-avatar loading-pulse">...</div>
+    </div>
+    <h2 id="profile-name" class="loading-pulse">Loading...</h2>
     <div class="muted" id="profile-meta" style="margin-bottom:0.75rem;"></div>
     <div class="pills" id="profile-pills"></div>
   </div>
@@ -212,7 +198,7 @@
   <div id="share-section" style="display:none;">
     <div class="section-label">Your shareable link</div>
     <div class="share-box">
-      <div class="share-url" id="share-url"></div>
+      <div class="share-url" id="share-url" style="font-size:0.72rem;"></div>
       <div style="display:flex;gap:10px;margin-top:10px;">
         <button style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="copyLink()">Copy link</button>
         <button style="background:#111;border:0.5px solid #333;color:#aaa;padding:8px 16px;border-radius:4px;font-size:0.82rem;cursor:pointer;font-family:'DM Sans',sans-serif;" onclick="shareLink()">Share →</button>
@@ -220,7 +206,6 @@
       <span id="copy-confirm" class="success-msg" style="display:none;margin-top:6px;">Copied!</span>
     </div>
 
-    <!-- CAPTION -->
     <div class="card" style="border-color:#1a1a1a;">
       <div class="section-label">Caption to post</div>
       <p id="caption-text" style="font-style:italic;font-size:0.9rem;color:#aaa;line-height:1.7;"></p>
@@ -232,11 +217,11 @@
   <!-- STATS -->
   <div class="stat-grid">
     <div class="stat-box">
-      <div class="num" id="response-count">0</div>
+      <div class="num" id="response-count">—</div>
       <div class="label">Responses</div>
     </div>
     <div class="stat-box">
-      <div class="num" id="views-count">0</div>
+      <div class="num" id="views-count">—</div>
       <div class="label">Profile views</div>
     </div>
   </div>
@@ -245,26 +230,28 @@
   <div class="card" style="border-color:#1a1a1a;">
     <div class="section-label">Activity</div>
     <div id="activity-feed">
-      <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">No activity yet. Activate your link to get responses.</div>
+      <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">
+        Activate your link to start getting responses.
+      </div>
     </div>
   </div>
 
   <!-- PAGES -->
   <div class="section-label" style="margin-top:1.5rem;">Pages</div>
-  <a href="respond.html" class="preview-btn">
+  <div class="preview-btn" onclick="previewRespond()">
     <div>
       <div class="preview-btn-label">What your followers see</div>
       <div class="preview-btn-title">Respond page →</div>
     </div>
     <div class="preview-arrow">›</div>
-  </a>
+  </div>
 
   <!-- GENERATE -->
   <div style="margin-top:1.5rem;">
     <button class="btn-primary" id="generate-btn" onclick="goGenerate()" disabled style="opacity:0.4;">
       Generate my roast + villain arc →
     </button>
-    <p style="text-align:center;font-size:0.78rem;color:#555;margin-top:8px;">
+    <p style="text-align:center;font-size:0.78rem;color:#555;margin-top:8px;" id="generate-sub">
       Need at least 3 responses to generate
     </p>
   </div>
@@ -275,59 +262,164 @@
 
   <script src="app.js"></script>
   <script>
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
     let responseCount = 0;
     let timerInterval = null;
-    const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+    let profile = {};
+    let profileId = null;
 
-    const profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
-    if (!profile.name) window.location.href = 'create.html';
+    async function init() {
+      // Load from localStorage first for speed
+      profile = JSON.parse(localStorage.getItem('nfz_profile') || '{}');
+      profileId = localStorage.getItem('nfz_profile_id');
 
-    // Avatar
-    const avatarWrap = document.getElementById('avatar-wrap');
-    if (profile.photo) {
-      avatarWrap.innerHTML = `<img src="${profile.photo}" class="photo-avatar" alt="${profile.name}">`;
-    } else {
-      avatarWrap.innerHTML = `<div class="initials-avatar">${profile.name[0].toUpperCase()}</div>`;
+      if (!profile.name) {
+        window.location.href = 'create.html';
+        return;
+      }
+
+      // Render immediately from localStorage
+      renderProfile(profile);
+
+      // Then fetch fresh data from Supabase
+      if (profileId) {
+        try {
+          const { data, error } = await db
+            .from('profiles')
+            .select('*')
+            .eq('id', profileId)
+            .single();
+
+          if (data && !error) {
+            profile = { ...data };
+            localStorage.setItem('nfz_profile', JSON.stringify(profile));
+            renderProfile(profile);
+            responseCount = data.response_count || 0;
+            document.getElementById('response-count').textContent = responseCount;
+            updateBtn();
+
+            // Load real responses for activity feed
+            await loadActivity();
+          }
+        } catch (e) {
+          console.error('Supabase fetch error:', e);
+        }
+      }
+
+      // Views counter
+      let views = parseInt(localStorage.getItem('nfz_views') || '0');
+      views += Math.floor(Math.random() * 3) + 1;
+      localStorage.setItem('nfz_views', views);
+      document.getElementById('views-count').textContent = views;
+
+      // Timer
+      renderTimerSection();
+      const expiresAt = localStorage.getItem('nfz_expires_at');
+      if (expiresAt && Date.now() < parseInt(expiresAt)) {
+        startTimerInterval();
+      }
     }
 
-    document.getElementById('profile-name').textContent = profile.name;
-    document.getElementById('profile-meta').textContent = `${profile.age} yrs • ${profile.job}`;
+    function renderProfile(p) {
+      const avatarWrap = document.getElementById('avatar-wrap');
+      if (p.photo) {
+        avatarWrap.innerHTML = `<img src="${p.photo}" class="photo-avatar" alt="${p.name}">`;
+      } else {
+        avatarWrap.innerHTML = `<div class="initials-avatar">${p.name[0].toUpperCase()}</div>`;
+      }
 
-    const handle = profile.name.toLowerCase().replace(/\s+/g, '');
-    document.getElementById('share-url').textContent = `nofilterzim.netlify.app/respond.html?u=${handle}`;
+      document.getElementById('profile-name').textContent = p.name;
+      document.getElementById('profile-name').classList.remove('loading-pulse');
+      document.getElementById('profile-meta').textContent = `${p.age} yrs • ${p.job} • ${p.city}`;
 
-    const pillsEl = document.getElementById('profile-pills');
-    [profile.rel, profile.good ? 'Great at: ' + profile.good : null, profile.flex]
-      .filter(Boolean).forEach(p => {
-        const span = document.createElement('span');
-        span.className = 'pill';
-        span.textContent = p;
-        pillsEl.appendChild(span);
+      const pillsEl = document.getElementById('profile-pills');
+      pillsEl.innerHTML = '';
+      [p.rel, p.good ? 'Great at: ' + p.good : null, p.flex]
+        .filter(Boolean).forEach(text => {
+          const span = document.createElement('span');
+          span.className = 'pill';
+          span.textContent = text;
+          pillsEl.appendChild(span);
+        });
+    }
+
+    async function loadActivity() {
+      if (!profileId) return;
+      try {
+        const { data, error } = await db
+          .from('responses')
+          .select('created_at, respondent_name')
+          .eq('profile_id', profileId)
+          .order('created_at', { ascending: false })
+          .limit(5);
+
+        if (data && data.length > 0) {
+          const feed = document.getElementById('activity-feed');
+          feed.innerHTML = '';
+          data.forEach(r => {
+            const time = new Date(r.created_at);
+            const diff = Date.now() - time.getTime();
+            const mins = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const timeStr = mins < 60
+              ? `${mins} min ago`
+              : hours < 24
+              ? `${hours} hr ago`
+              : time.toLocaleDateString();
+
+            feed.innerHTML += `
+              <div class="activity-item">
+                <div class="activity-dot"></div>
+                <span>Someone answered your questions
+                  <span style="color:#444;">${timeStr}</span>
+                </span>
+              </div>`;
+          });
+        }
+      } catch (e) {
+        console.error('Activity feed error:', e);
+      }
+    }
+
+    function buildShareUrl() {
+      const expires = localStorage.getItem('nfz_expires_at') || '';
+      const isLocal = window.location.hostname === '127.0.0.1' ||
+                      window.location.hostname === 'localhost';
+      const base = isLocal
+        ? `http://127.0.0.1:5500/respond.html`
+        : `https://nofilterzim.netlify.app/respond.html`;
+
+      const params = new URLSearchParams({
+        name: profile.name || '',
+        age: profile.age || '',
+        job: profile.job || '',
+        rel: profile.rel || '',
+        city: profile.city || '',
+        good: profile.good || '',
+        flex: profile.flex || '',
+        expires: expires,
+        id: profileId || ''
       });
+      return `${base}?${params.toString()}`;
+    }
 
-    // Views
-    let views = parseInt(localStorage.getItem('nfz_views') || '0');
-    views += Math.floor(Math.random() * 8) + 1;
-    localStorage.setItem('nfz_views', views);
-    document.getElementById('views-count').textContent = views;
-
-    responseCount = parseInt(localStorage.getItem('nfz_response_count') || '0');
-    document.getElementById('response-count').textContent = responseCount;
-    updateBtn();
-
-    // ── TIMER LOGIC ──
     function renderTimerSection() {
       const timerSection = document.getElementById('timer-section');
       const shareSection = document.getElementById('share-section');
       const expiresAt = localStorage.getItem('nfz_expires_at');
       const now = Date.now();
 
-      // Not activated yet
       if (!expiresAt) {
         timerSection.innerHTML = `
           <div class="activate-box">
-            <div class="activate-title">⏱️ Timed Roast Mode</div>
-            <div class="activate-sub">
+            <div style="font-size:2rem;margin-bottom:0.75rem;">⏱️</div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:0.5rem;">
+              Timed Roast Mode
+            </div>
+            <div style="color:#666;font-size:0.85rem;margin-bottom:1.25rem;line-height:1.6;">
               Activate your link for exactly 24 hours.<br>
               Post it. Create urgency. Close it tonight.<br>
               <strong style="color:#9b5fff;">People respond more when time is running out.</strong>
@@ -342,15 +434,14 @@
 
       const expires = parseInt(expiresAt);
 
-      // Expired
       if (now >= expires) {
         timerSection.innerHTML = `
           <div class="expired-box">
             <div style="font-size:2rem;margin-bottom:0.75rem;">⌛</div>
             <h3 style="margin-bottom:0.5rem;">Your link has closed</h3>
             <p class="muted" style="margin-bottom:1.25rem;font-size:0.88rem;">
-              Your 24 hours are up. Generate your roast with the responses you got,
-              or reactivate for another round.
+              Your 24 hours are up. Generate your roast with the
+              responses you got or reactivate for another round.
             </p>
             <button class="btn-primary" onclick="goGenerate()" style="margin-bottom:10px;">
               Generate my roast →
@@ -364,8 +455,8 @@
         return;
       }
 
-      // Active — show countdown
       shareSection.style.display = 'block';
+      document.getElementById('share-url').textContent = buildShareUrl();
       updateCaptionText(expires);
 
       const remaining = expires - now;
@@ -406,6 +497,15 @@
     function activateTimer() {
       const expiresAt = Date.now() + TWENTY_FOUR_HOURS;
       localStorage.setItem('nfz_expires_at', expiresAt);
+
+      // Save expiry to Supabase too
+      if (profileId) {
+        db.from('profiles')
+          .update({ expires_at: expiresAt })
+          .eq('id', profileId)
+          .then(() => {});
+      }
+
       startTimerInterval();
       renderTimerSection();
     }
@@ -417,8 +517,18 @@
       responseCount = 0;
       document.getElementById('response-count').textContent = 0;
       document.getElementById('activity-feed').innerHTML = `
-        <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">New round started. Share your link again.</div>`;
+        <div style="color:#444;font-size:0.85rem;padding:0.5rem 0;">
+          New round started. Share your link again.
+        </div>`;
       updateBtn();
+
+      if (profileId) {
+        db.from('profiles')
+          .update({ expires_at: expiresAt, response_count: 0 })
+          .eq('id', profileId)
+          .then(() => {});
+      }
+
       startTimerInterval();
       renderTimerSection();
     }
@@ -427,23 +537,21 @@
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         renderTimerSection();
-        updateCaptionText(parseInt(localStorage.getItem('nfz_expires_at')));
       }, 1000);
     }
 
     function copyLink() {
-      const url = document.getElementById('share-url').textContent;
-      navigator.clipboard.writeText(url);
+      navigator.clipboard.writeText(buildShareUrl());
       const el = document.getElementById('copy-confirm');
       el.style.display = 'block';
       setTimeout(() => el.style.display = 'none', 2000);
     }
 
     function shareLink() {
-      const expiresAt = parseInt(localStorage.getItem('nfz_expires_at'));
+      const expiresAt = parseInt(localStorage.getItem('nfz_expires_at') || '0');
       const remaining = expiresAt - Date.now();
       const hours = Math.floor(remaining / (1000 * 60 * 60));
-      const text = `Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. Link closes in ${hours} hours.\n\nnofilterzim.netlify.app/respond.html?u=${handle}`;
+      const text = `Tell me what you REALLY think of me 😈 Be anonymous. Be brutal. Link closes in ${hours} hours.\n\n${buildShareUrl()}`;
       navigator.share ? navigator.share({ title: 'No Filter Zim', text }) : copyLink();
     }
 
@@ -455,7 +563,11 @@
       setTimeout(() => el.style.display = 'none', 2000);
     }
 
-    function simulateResponses() {
+    function previewRespond() {
+      window.open(buildShareUrl(), '_blank');
+    }
+
+    async function simulateResponses() {
       const expiresAt = localStorage.getItem('nfz_expires_at');
       if (!expiresAt) {
         alert('Activate your timed link first!');
@@ -465,9 +577,16 @@
         alert('Your link has expired. Reactivate to get more responses.');
         return;
       }
+
       responseCount = Math.floor(Math.random() * 6) + 4;
       localStorage.setItem('nfz_response_count', responseCount);
       document.getElementById('response-count').textContent = responseCount;
+
+      if (profileId) {
+        await db.from('profiles')
+          .update({ response_count: responseCount })
+          .eq('id', profileId);
+      }
 
       const feed = document.getElementById('activity-feed');
       const times = ['2 min ago', '8 min ago', '15 min ago', '31 min ago', '1 hr ago'];
@@ -476,7 +595,9 @@
         feed.innerHTML += `
           <div class="activity-item">
             <div class="activity-dot"></div>
-            <span>Someone answered your questions <span style="color:#444;">${times[i]}</span></span>
+            <span>Someone answered your questions
+              <span style="color:#444;">${times[i]}</span>
+            </span>
           </div>`;
       }
       updateBtn();
@@ -487,6 +608,8 @@
       if (responseCount >= 3) {
         btn.disabled = false;
         btn.style.opacity = '1';
+        document.getElementById('generate-sub').textContent =
+          `${responseCount} responses ready — generate your roast`;
       }
     }
 
@@ -496,19 +619,18 @@
 
     function resetProfile() {
       if (confirm('This will delete your profile and all responses. Are you sure?')) {
+        if (profileId) {
+          db.from('profiles').delete().eq('id', profileId).then(() => {});
+        }
         clearData();
         localStorage.removeItem('nfz_expires_at');
         localStorage.removeItem('nfz_views');
+        localStorage.removeItem('nfz_profile_id');
         window.location.href = 'index.html';
       }
     }
 
-    // Init
-    renderTimerSection();
-    const expiresAt = localStorage.getItem('nfz_expires_at');
-    if (expiresAt && Date.now() < parseInt(expiresAt)) {
-      startTimerInterval();
-    }
+    init();
   </script>
 
 </body>
