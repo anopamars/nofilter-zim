@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>How it works — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--black);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .slide-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 30% 40%, #0d0015 0%, #0a0a0a 70%);
+      z-index: 0;
+    }
+    .cinema-line {
+      position: fixed;
+      left: 0; right: 0;
+      height: 60px;
+      background: #000;
+      z-index: 2;
+    }
+    .cinema-top { top: 0; }
+    .cinema-bottom { bottom: 0; }
+    .content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      animation: fadeUp 0.6s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      animation: iconFloat 3s ease-in-out infinite;
+    }
+    @keyframes iconFloat {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .slide-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+    .slide-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2.6rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .slide-headline em { color: var(--purple); font-style: normal; }
+    .slide-body {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .stat-pills {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .stat-pill {
+      background: #111;
+      border: 0.5px solid #1a1a1a;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      color: #666;
+    }
+    .stat-pill strong {
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+    }
+    .dots-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .dot-ind {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: #222;
+      transition: all 0.3s ease;
+    }
+    .dot-ind.active { background: var(--red); width: 24px; }
+    .slide-btn {
+      background: var(--red);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 380px;
+      transition: transform 0.15s, background 0.15s;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+      margin-bottom: 12px;
+    }
+    .slide-btn:hover { background: #e02020; transform: translateY(-1px); }
+    .back-btn {
+      display: block;
+      text-align: center;
+      color: #444;
+      font-size: 0.85rem;
+      text-decoration: none;
+      font-family: 'DM Sans', sans-serif;
+      transition: color 0.15s;
+    }
+    .back-btn:hover { color: #888; }
+    .skip-btn {
+      position: fixed;
+      top: 70px;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      z-index: 10;
+      transition: color 0.15s;
+      text-decoration: none;
+    }
+    .skip-btn:hover { color: #666; }
+  </style>
+</head>
+<body>
+  <div class="slide-bg"></div>
+  <div class="cinema-line cinema-top"></div>
+  <div class="cinema-line cinema-bottom"></div>
+
+  <a href="index.html" class="skip-btn">Skip →</a>
+
+  <div class="content">
+    <span class="slide-icon">🔗</span>
+    <div class="slide-eyebrow">How it works</div>
+    <div class="slide-headline">Share your link.<br><em>Brace yourself.</em></div>
+    <div class="slide-body">
+      Create your profile. Activate your 24-hour link.
+      Post it. Your followers answer anonymously.
+      AI turns their answers into one brutal roast card.
+    </div>
+    <div class="stat-pills">
+      <div class="stat-pill"><strong>24hrs</strong> only</div>
+      <div class="stat-pill"><strong>100%</strong> anonymous</div>
+      <div class="stat-pill"><strong>AI</strong> powered</div>
+      <div class="stat-pill"><strong>Zim</strong> built</div>
+    </div>
+    <div class="dots-row">
+      <div class="dot-ind"></div>
+      <div class="dot-ind active"></div>
+      <div class="dot-ind"></div>
+      <div class="dot-ind"></div>
+    </div>
+    <a href="onboarding-3.html" class="slide-btn">What do I get? →</a>
+    <a href="onboarding-1.html" class="back-btn">← Back</a>
+  </div>
+</body>
+</html>

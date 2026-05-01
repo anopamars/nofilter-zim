@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--black);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+    .slide-bg {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 50% 60%, #1a0000 0%, #0a0a0a 70%);
+      z-index: 0;
+    }
+    .cinema-line {
+      position: fixed;
+      left: 0; right: 0;
+      height: 60px;
+      background: #000;
+      z-index: 2;
+    }
+    .cinema-top { top: 0; }
+    .cinema-bottom { bottom: 0; }
+    .scanline {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: rgba(255,45,45,0.15);
+      animation: scan 4s linear infinite;
+      z-index: 1;
+      pointer-events: none;
+    }
+    @keyframes scan { 0%{top:0;} 100%{top:100%;} }
+    .content {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      max-width: 420px;
+      width: 100%;
+      animation: fadeUp 0.6s ease forwards;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo-anim {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.02em;
+      color: var(--white);
+      margin-bottom: 2rem;
+      opacity: 0;
+      animation: logoReveal 0.8s ease 0.3s forwards;
+    }
+    .logo-anim span { color: var(--red); }
+    @keyframes logoReveal {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-icon {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      display: block;
+      animation: iconFloat 3s ease-in-out infinite;
+    }
+    @keyframes iconFloat {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .slide-eyebrow {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #444;
+      margin-bottom: 1rem;
+    }
+    .slide-headline {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 2.6rem;
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      color: var(--white);
+      margin-bottom: 1rem;
+    }
+    .slide-headline em { color: var(--red); font-style: normal; }
+    .slide-body {
+      font-size: 0.95rem;
+      color: #666;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .dots-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+    .dot-ind {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: #222;
+      transition: all 0.3s ease;
+    }
+    .dot-ind.active {
+      background: var(--red);
+      width: 24px;
+    }
+    .slide-btn {
+      background: var(--red);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      border-radius: 4px;
+      width: 100%;
+      max-width: 380px;
+      transition: transform 0.15s, background 0.15s;
+      letter-spacing: 0.02em;
+      display: block;
+      text-align: center;
+      text-decoration: none;
+    }
+    .slide-btn:hover { background: #e02020; transform: translateY(-1px); }
+    .slide-btn:active { transform: scale(0.98); }
+    .skip-btn {
+      position: fixed;
+      top: 70px;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: #333;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      z-index: 10;
+      transition: color 0.15s;
+      text-decoration: none;
+    }
+    .skip-btn:hover { color: #666; }
+    .glitch { position: relative; }
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      overflow: hidden;
+    }
+    .glitch::before {
+      color: var(--red);
+      animation: glitch1 3s infinite;
+      clip-path: polygon(0 0, 100% 0, 100% 35%, 0 35%);
+    }
+    .glitch::after {
+      color: #4a6fff;
+      animation: glitch2 3s infinite;
+      clip-path: polygon(0 65%, 100% 65%, 100% 100%, 0 100%);
+    }
+    @keyframes glitch1 {
+      0%,90%,100%{transform:none;opacity:0;}
+      92%{transform:translateX(-3px);opacity:0.8;}
+      94%{transform:translateX(3px);opacity:0.8;}
+      96%{transform:none;opacity:0;}
+    }
+    @keyframes glitch2 {
+      0%,90%,100%{transform:none;opacity:0;}
+      93%{transform:translateX(3px);opacity:0.8;}
+      95%{transform:translateX(-3px);opacity:0.8;}
+      97%{transform:none;opacity:0;}
+    }
+  </style>
+</head>
+<body>
+  <div class="slide-bg"></div>
+  <div class="scanline"></div>
+  <div class="cinema-line cinema-top"></div>
+  <div class="cinema-line cinema-bottom"></div>
+
+  <a href="index.html" class="skip-btn">Skip →</a>
+
+  <div class="content">
+    <div class="logo-anim">no<span>filter</span> <span style="color:#555;font-size:0.9rem;">zim</span></div>
+    <span class="slide-icon">💀</span>
+    <div class="slide-eyebrow">Zimbabwe's most brutal app</div>
+    <div class="slide-headline glitch" data-text="What do people really think of you?">
+      What do people <em>really</em> think of you?
+    </div>
+    <div class="slide-body">
+      Not what they say to your face.<br>
+      What they say behind your back.
+    </div>
+    <div class="dots-row">
+      <div class="dot-ind active"></div>
+      <div class="dot-ind"></div>
+      <div class="dot-ind"></div>
+      <div class="dot-ind"></div>
+    </div>
+    <a href="onboarding-2.html" class="slide-btn">Find out →</a>
+  </div>
+</body>
+</html>
