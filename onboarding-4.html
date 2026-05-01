@@ -14,85 +14,85 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem 1.5rem;
-      overflow: hidden;
+      padding: 5rem 1.5rem;
       position: relative;
+      overflow: hidden;
     }
-    .slide-bg {
+    .bg {
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      inset: 0;
       background: radial-gradient(ellipse at 50% 50%, #1a0800 0%, #0a0a0a 70%);
       z-index: 0;
     }
-    .cinema-line {
+    .bar {
       position: fixed;
       left: 0; right: 0;
-      height: 60px;
+      height: 55px;
       background: #000;
       z-index: 2;
     }
-    .cinema-top { top: 0; }
-    .cinema-bottom { bottom: 0; }
+    .bar.top { top: 0; }
+    .bar.bottom { bottom: 0; }
     .scanline {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      inset: 0;
       height: 2px;
-      background: rgba(255,45,45,0.15);
+      background: rgba(255,45,45,0.12);
       animation: scan 4s linear infinite;
       z-index: 1;
       pointer-events: none;
     }
-    @keyframes scan { 0%{top:0;} 100%{top:100%;} }
+    @keyframes scan { from{top:0} to{top:100%} }
     .content {
       position: relative;
       z-index: 3;
       text-align: center;
-      max-width: 420px;
+      max-width: 400px;
       width: 100%;
-      animation: fadeUp 0.6s ease forwards;
+      animation: up 0.5s ease forwards;
     }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes up {
+      from { opacity:0; transform:translateY(16px); }
+      to { opacity:1; transform:translateY(0); }
     }
-    .slide-icon {
+    .icon {
       font-size: 5rem;
-      margin-bottom: 1.5rem;
       display: block;
-      animation: iconFloat 3s ease-in-out 1s infinite;
+      margin-bottom: 1.5rem;
+      animation: float 3s ease-in-out 1s infinite;
     }
-    @keyframes iconFloat {
-      0%,100% { transform: translateY(0); }
-      50% { transform: translateY(-12px); }
+    @keyframes float {
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-12px)}
     }
-    .slide-eyebrow {
-      font-size: 0.7rem;
+    .eyebrow {
+      font-size: 0.68rem;
       letter-spacing: 0.2em;
       text-transform: uppercase;
       color: #444;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
     }
-    .slide-headline {
+    .headline {
       font-family: 'Syne', sans-serif;
       font-weight: 800;
-      font-size: 2.6rem;
+      font-size: 2.4rem;
       line-height: 1.05;
       letter-spacing: -0.04em;
       color: var(--white);
       margin-bottom: 1rem;
     }
-    .slide-headline em { color: var(--red); font-style: normal; }
-    .slide-body {
+    .headline em { color: var(--red); font-style: normal; }
+    .body {
       font-size: 0.95rem;
       color: #666;
       line-height: 1.7;
       margin-bottom: 1.5rem;
     }
-    .remember-box {
+    .remember {
       background: #111;
       border: 0.5px solid #1a1a1a;
       border-radius: 8px;
-      padding: 1rem;
+      padding: 1rem 1.25rem;
       margin-bottom: 2rem;
       text-align: left;
     }
@@ -106,22 +106,17 @@
     .remember-list {
       font-size: 0.82rem;
       color: #666;
-      line-height: 1.8;
+      line-height: 1.9;
     }
-    .dots-row {
+    .dots {
       display: flex;
       gap: 8px;
       justify-content: center;
       margin-bottom: 2rem;
     }
-    .dot-ind {
-      width: 6px;
-      height: 6px;
-      border-radius: 3px;
-      background: #222;
-    }
-    .dot-ind.active { background: var(--red); width: 24px; }
-    .slide-btn {
+    .dot { width:6px; height:6px; border-radius:3px; background:#222; }
+    .dot.active { background:var(--red); width:24px; }
+    .btn {
       background: var(--red);
       color: white;
       border: none;
@@ -129,61 +124,34 @@
       font-family: 'Syne', sans-serif;
       font-weight: 700;
       font-size: 1rem;
-      cursor: pointer;
       border-radius: 4px;
       width: 100%;
-      max-width: 380px;
+      display: block;
+      text-align: center;
+      text-decoration: none;
       transition: transform 0.15s, background 0.15s;
-      display: block;
-      text-align: center;
-      text-decoration: none;
-      margin-bottom: 12px;
-    }
-    .slide-btn:hover { background: #e02020; transform: translateY(-1px); }
-    .back-btn {
-      display: block;
-      text-align: center;
-      color: #444;
-      font-size: 0.85rem;
-      text-decoration: none;
-      font-family: 'DM Sans', sans-serif;
-    }
-    .back-btn:hover { color: #888; }
-    .skip-btn {
-      position: fixed;
-      top: 70px;
-      right: 1.5rem;
-      background: none;
-      border: none;
-      color: #333;
-      font-size: 0.8rem;
       cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      z-index: 10;
-      text-decoration: none;
     }
-    .skip-btn:hover { color: #666; }
+    .btn:hover { background:#e02020; transform:translateY(-1px); }
   </style>
 </head>
 <body>
-  <div class="slide-bg"></div>
+  <div class="bg"></div>
   <div class="scanline"></div>
-  <div class="cinema-line cinema-top"></div>
-  <div class="cinema-line cinema-bottom"></div>
-
-  <a href="index.html" class="skip-btn">Skip →</a>
+  <div class="bar top"></div>
+  <div class="bar bottom"></div>
 
   <div class="content">
-    <span class="slide-icon">🇿🇼</span>
-    <div class="slide-eyebrow">Built for Zimbabwe</div>
-    <div class="slide-headline">Ready to get <em>roasted?</em></div>
-    <div class="slide-body">
+    <span class="icon">🇿🇼</span>
+    <div class="eyebrow">Built for Zimbabwe</div>
+    <div class="headline">Ready to get <em>roasted?</em></div>
+    <div class="body">
       Create your profile in 60 seconds.
       Share your link. Let the people talk.
       Then face the truth.
     </div>
 
-    <div class="remember-box">
+    <div class="remember">
       <div class="remember-label">Remember</div>
       <div class="remember-list">
         ✓ Responses are always anonymous<br>
@@ -193,23 +161,16 @@
       </div>
     </div>
 
-    <div class="dots-row">
-      <div class="dot-ind"></div>
-      <div class="dot-ind"></div>
-      <div class="dot-ind"></div>
-      <div class="dot-ind active"></div>
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot active"></div>
     </div>
 
-    <a href="index.html" class="slide-btn" onclick="finish()">
+    <a href="index.html" class="btn" onclick="localStorage.setItem('nfz_onboarded','true')">
       Let's go →
     </a>
-    <a href="onboarding-3.html" class="back-btn">← Back</a>
   </div>
-
-  <script>
-    function finish() {
-      localStorage.setItem('nfz_onboarded', 'true');
-    }
-  </script>
 </body>
 </html>
