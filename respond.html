@@ -8,12 +8,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
   <style>
-    .q-transition {
-      animation: slideIn 0.3s ease;
-    }
+    .q-transition { animation: slideIn 0.3s ease; }
     @keyframes slideIn {
-      from { opacity: 0; transform: translateX(20px); }
-      to { opacity: 1; transform: translateX(0); }
+      from { opacity:0; transform:translateX(20px); }
+      to { opacity:1; transform:translateX(0); }
     }
     .image-roast-zone {
       border: 2px dashed #2a2a2a;
@@ -27,182 +25,68 @@
       position: relative;
     }
     .image-roast-zone:hover { border-color: var(--red); }
-    .image-roast-zone.has-image {
-      border-color: var(--red);
-      border-style: solid;
-      padding: 0;
-      overflow: hidden;
-    }
-    .image-roast-zone img {
-      width: 100%;
-      max-height: 240px;
-      object-fit: cover;
-      display: block;
-      border-radius: 6px;
-    }
-    .image-roast-zone .upload-label {
-      color: #444;
-      font-size: 0.85rem;
-      line-height: 1.8;
-    }
-    .image-roast-zone .upload-icon {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-      display: block;
-    }
+    .image-roast-zone.has-image { border-color:var(--red); border-style:solid; padding:0; overflow:hidden; }
+    .image-roast-zone img { width:100%; max-height:240px; object-fit:cover; display:block; border-radius:6px; }
+    .image-roast-zone .upload-label { color:#444; font-size:0.85rem; line-height:1.8; }
+    .image-roast-zone .upload-icon { font-size:2rem; margin-bottom:0.5rem; display:block; }
     .image-remove {
-      position: absolute;
-      top: 8px; right: 8px;
-      background: rgba(0,0,0,0.7);
-      border: none;
-      color: white;
-      border-radius: 50%;
-      width: 28px; height: 28px;
-      cursor: pointer;
-      font-size: 0.9rem;
-      display: none;
-      align-items: center;
-      justify-content: center;
+      position:absolute; top:8px; right:8px;
+      background:rgba(0,0,0,0.7); border:none; color:white;
+      border-radius:50%; width:28px; height:28px;
+      cursor:pointer; font-size:0.9rem; display:none;
+      align-items:center; justify-content:center;
     }
-    .image-roast-zone.has-image .image-remove { display: flex; }
-    .reaction-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 1rem;
-    }
+    .image-roast-zone.has-image .image-remove { display:flex; }
+    .reaction-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:1rem; }
     .reaction-chip {
-      background: #111;
-      border: 0.5px solid #2a2a2a;
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 0.82rem;
-      color: #777;
-      cursor: pointer;
-      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      background:#111; border:0.5px solid #2a2a2a;
+      border-radius:20px; padding:6px 14px;
+      font-size:0.82rem; color:#777; cursor:pointer;
+      transition:border-color 0.15s, color 0.15s, background 0.15s;
     }
-    .reaction-chip:hover { border-color: var(--red); color: var(--white); }
-    .reaction-chip.selected {
-      background: #1a0000;
-      border-color: var(--red);
-      color: var(--red);
-    }
+    .reaction-chip:hover { border-color:var(--red); color:var(--white); }
+    .reaction-chip.selected { background:#1a0000; border-color:var(--red); color:var(--red); }
     .q-type-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.72rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #555;
-      margin-bottom: 0.75rem;
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:0.72rem; letter-spacing:0.1em;
+      text-transform:uppercase; color:#555; margin-bottom:0.75rem;
     }
-    .q-type-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--red); }
+    .q-type-dot { width:5px; height:5px; border-radius:50%; background:var(--red); }
     .urgency-banner {
-      background: #0a0000;
-      border: 1px solid var(--red);
-      border-radius: 8px;
-      padding: 0.75rem 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.25rem;
+      background:#0a0000; border:1px solid var(--red);
+      border-radius:8px; padding:0.75rem 1rem;
+      display:flex; align-items:center;
+      justify-content:space-between; margin-bottom:1.25rem;
     }
-    .urgency-left { font-size: 0.82rem; color: #aaa; }
-    .urgency-timer {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1rem;
-      color: var(--red);
-    }
-    .urgency-timer.critical { animation: urgentPulse 1s infinite; }
+    .urgency-left { font-size:0.82rem; color:#aaa; }
+    .urgency-timer { font-family:'Syne',sans-serif; font-weight:800; font-size:1rem; color:var(--red); }
+    .urgency-timer.critical { animation:urgentPulse 1s infinite; }
     @keyframes urgentPulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
-    .expired-screen { text-align: center; padding: 3rem 0; }
-    .expired-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
-    .done-screen { text-align: center; padding: 3rem 0; }
-    .done-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .expired-screen { text-align:center; padding:3rem 0; }
+    .expired-icon { font-size:3rem; margin-bottom:1rem; display:block; }
+    .done-screen { text-align:center; padding:3rem 0; }
+    .done-icon { font-size:3rem; margin-bottom:1rem; display:block; }
     .subject-initials {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      background: var(--red);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.3rem;
-      color: white;
-      margin-bottom: 1rem;
+      width:56px; height:56px; border-radius:50%;
+      background:var(--red); display:flex;
+      align-items:center; justify-content:center;
+      font-family:'Syne',sans-serif; font-weight:800;
+      font-size:1.3rem; color:white; margin-bottom:1rem;
     }
-
-    /* SIGN IN SCREEN */
-    .signin-screen {
-      text-align: center;
-      padding: 2rem 0;
+    .anon-notice {
+      background:#0a0a0a; border:0.5px solid #1a1a1a;
+      border-radius:8px; padding:0.75rem 1rem;
+      margin-bottom:1.25rem;
+      display:flex; align-items:center; gap:10px;
     }
-    .signin-icon { font-size: 3rem; margin-bottom: 1rem; display: block; }
-    .google-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      background: white;
-      color: #333;
-      border: none;
-      padding: 14px 24px;
-      border-radius: 4px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 500;
-      cursor: pointer;
-      width: 100%;
-      max-width: 320px;
-      margin: 0 auto 1rem;
-      transition: background 0.15s, transform 0.15s;
-    }
-    .google-btn:hover { background: #f5f5f5; transform: translateY(-1px); }
-    .google-btn:active { transform: scale(0.98); }
-    .google-icon {
-      width: 20px;
-      height: 20px;
-      flex-shrink: 0;
-    }
-    .signin-note {
-      font-size: 0.75rem;
-      color: #444;
-      line-height: 1.6;
-      margin-top: 1rem;
-    }
-
-    /* USER BADGE */
-    .user-badge {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #111;
-      border: 0.5px solid #222;
-      border-radius: 20px;
-      padding: 6px 12px;
-      font-size: 0.78rem;
-      color: #888;
-      margin-bottom: 1.25rem;
-    }
-    .user-badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #3a3;
-    }
+    .anon-notice-text { font-size:0.78rem; color:#555; line-height:1.5; }
   </style>
 </head>
 <body>
 
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
     <div class="logo">no<span>filter</span> <span style="color:#555;font-size:0.9rem;">zim</span></div>
-    <div class="anon-badge">
-      <div class="anon-dot"></div>
-      anonymous
-    </div>
+    <div class="anon-badge"><div class="anon-dot"></div>anonymous</div>
   </div>
 
   <!-- URGENCY BANNER -->
@@ -219,38 +103,37 @@
     <div class="pills" id="subject-pills"></div>
   </div>
 
-  <!-- USER BADGE (shown when signed in) -->
-  <div class="user-badge" id="user-badge" style="display:none;">
-    <div class="user-badge-dot"></div>
-    <span id="user-badge-text">Signed in</span>
+  <!-- ANON NOTICE -->
+  <div class="anon-notice">
+    <div class="anon-dot" style="width:8px;height:8px;flex-shrink:0;"></div>
+    <div class="anon-notice-text">
+      Your answers are completely anonymous.
+      <span id="subject-name-inline"></span> will never know it was you.
+      No sign in required.
+    </div>
   </div>
 
-  <div class="progress-bar" id="progress-bar" style="display:none;">
+  <div class="progress-bar">
     <div class="progress-fill" id="progress" style="width:0%"></div>
   </div>
-  <p class="muted" style="font-size:0.78rem;margin-bottom:1.5rem;text-align:right;display:none;" id="progress-label">
-    Question 1 of 6
+  <p class="muted" style="font-size:0.78rem;margin-bottom:1.5rem;text-align:right;" id="progress-label">
+    Question 1 of 4
   </p>
 
-  <div id="main-area"></div>
+  <div id="question-area"></div>
 
   <script src="app.js"></script>
   <script>
     const { createClient } = supabase;
     const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // Simplified to 4 questions — no Google sign in needed
     const QUESTIONS = [
       {
         type: 'text',
         q: "What is their biggest red flag that they pretend isn't there?",
         placeholder: "Be honest, they can't see who said this...",
         chips: ['Overconfident', 'Inconsistent', 'Delusional', 'Procrastinator', 'People pleaser']
-      },
-      {
-        type: 'image',
-        q: "Upload a photo of them and roast what you see.",
-        placeholder: "Describe what this photo says about their life choices...",
-        chips: ['The outfit says a lot', 'That background though', 'The energy is off', 'Trying too hard', 'Actually looks good']
       },
       {
         type: 'text',
@@ -266,40 +149,36 @@
       },
       {
         type: 'text',
-        q: "Rate their life choices from 1–10 and explain why.",
-        placeholder: "1 = total disaster, 10 = they are absolutely winning...",
-        chips: ['3 — needs serious help', '5 — potential but wasted', '6 — doing okay', '7 — actually solid', '4 — almost there']
-      },
-      {
-        type: 'text',
-        q: "If you had to predict where they will be in 5 years, what is your honest take?",
-        placeholder: "Be real about it...",
-        chips: ['Same spot, different excuses', 'Actually winning', 'Glow up incoming', 'Depends on their choices', 'Hard to say']
+        q: "Rate their life choices 1–10 and predict where they'll be in 5 years.",
+        placeholder: "Be brutally honest...",
+        chips: ['3 — needs serious help', '5 — potential but wasted', '6 — doing okay', '7 — actually solid', 'Glow up incoming']
       }
     ];
 
     let currentQ = 0;
     let answers = [];
-    let imageData = null;
     let selectedChip = null;
     let urgencyInterval = null;
-    let currentUser = null;
-    let profileId = null;
+
+    // Generate anonymous device token
+    function getDeviceToken() {
+      let token = localStorage.getItem('nfz_device_token');
+      if (!token) {
+        token = 'dev_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+        localStorage.setItem('nfz_device_token', token);
+      }
+      return token;
+    }
 
     // Read URL params
     const params = new URLSearchParams(window.location.search);
     const isDemo = params.get('demo') === 'true';
 
     const subject = isDemo ? {
-      name: 'Chido',
-      age: '24',
-      job: 'Content Creator',
-      rel: 'Single and thriving',
-      good: 'storytelling',
-      flex: 'Just hit 10k followers',
-      city: 'Harare',
-      expires: null,
-      id: null
+      name: 'Chido', age: '24', job: 'Content Creator',
+      rel: 'Single and thriving', good: 'storytelling',
+      flex: 'Just hit 10k followers', city: 'Harare',
+      expires: null, id: null
     } : {
       name: params.get('name') || '',
       age: params.get('age') || '',
@@ -312,28 +191,29 @@
       id: params.get('id') || null
     };
 
-    profileId = subject.id;
-
-    // Build subject card
+    // Validate
     if (!isDemo && !subject.name) {
       document.getElementById('subject-card').style.display = 'none';
-      document.getElementById('main-area').innerHTML = `
+      document.querySelector('.progress-bar').style.display = 'none';
+      document.getElementById('progress-label').style.display = 'none';
+      document.getElementById('question-area').innerHTML = `
         <div class="expired-screen">
           <span class="expired-icon">🔗</span>
           <h2 style="margin-bottom:0.5rem;">Invalid link</h2>
-          <p class="muted" style="margin-bottom:2rem;">
-            This link is broken. Ask the person to reshare their link.
-          </p>
+          <p class="muted" style="margin-bottom:2rem;">Ask the person to reshare their link.</p>
           <a href="index.html" class="btn-primary">Create my own profile →</a>
         </div>`;
     } else {
-      const avatarWrap = document.getElementById('subject-avatar-wrap');
-      avatarWrap.innerHTML = `<div class="subject-initials">${subject.name[0].toUpperCase()}</div>`;
+
+      // Build subject card
+      document.getElementById('subject-avatar-wrap').innerHTML =
+        `<div class="subject-initials">${subject.name[0].toUpperCase()}</div>`;
       document.getElementById('subject-name').textContent = subject.name;
+      document.getElementById('subject-name-inline').textContent = subject.name;
       document.getElementById('subject-meta').textContent = `${subject.age} yrs • ${subject.job}`;
 
       const pillsEl = document.getElementById('subject-pills');
-      [subject.rel, subject.good ? 'Great at: ' + subject.good : null, subject.flex, subject.city]
+      [subject.rel, subject.good ? 'Great at: ' + subject.good : null, subject.city]
         .filter(Boolean).forEach(p => {
           const span = document.createElement('span');
           span.className = 'pill';
@@ -346,329 +226,186 @@
       const isExpired = expiresAt && Date.now() >= expiresAt;
       const isNotActivated = !isDemo && !expiresAt;
 
-      if (isExpired) {
-        renderExpired();
-      } else if (isNotActivated) {
-        renderNotActivated();
-      } else {
-        // Show urgency timer
-        if (!isDemo && expiresAt) {
-          document.getElementById('urgency-banner').style.display = 'flex';
-          updateUrgencyTimer();
-          urgencyInterval = setInterval(updateUrgencyTimer, 1000);
+      if (!isDemo && expiresAt && !isExpired) {
+        document.getElementById('urgency-banner').style.display = 'flex';
+        updateUrgencyTimer();
+        urgencyInterval = setInterval(updateUrgencyTimer, 1000);
+      }
+
+      function updateUrgencyTimer() {
+        const remaining = expiresAt - Date.now();
+        if (remaining <= 0) { clearInterval(urgencyInterval); renderExpired(); return; }
+        const h = Math.floor(remaining / (1000 * 60 * 60));
+        const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((remaining % (1000 * 60)) / 1000);
+        const el = document.getElementById('urgency-timer');
+        el.textContent = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        el.className = 'urgency-timer' + (h < 2 ? ' critical' : '');
+      }
+
+      function renderExpired() {
+        document.getElementById('urgency-banner').style.display = 'none';
+        document.getElementById('subject-card').style.display = 'none';
+        document.getElementById('question-area').innerHTML = `
+          <div class="expired-screen">
+            <span class="expired-icon">⌛</span>
+            <h2 style="margin-bottom:0.5rem;">This link has closed</h2>
+            <p class="muted" style="margin-bottom:2rem;">${subject.name}'s roast window has ended.</p>
+            <a href="index.html" class="btn-primary">Create my own profile →</a>
+          </div>`;
+      }
+
+      function renderNotActivated() {
+        document.getElementById('question-area').innerHTML = `
+          <div class="expired-screen">
+            <span class="expired-icon">🔒</span>
+            <h2 style="margin-bottom:0.5rem;">Link not active yet</h2>
+            <p class="muted" style="margin-bottom:2rem;">
+              ${subject.name} hasn't activated their roast window yet.
+            </p>
+            <a href="index.html" class="btn-primary">Create my own profile →</a>
+          </div>`;
+      }
+
+      if (isExpired) { renderExpired(); }
+      else if (isNotActivated) { renderNotActivated(); }
+      else { renderQuestion(); }
+
+      function renderQuestion() {
+        selectedChip = null;
+        const pct = (currentQ / QUESTIONS.length) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+        document.getElementById('progress-label').textContent =
+          `Question ${currentQ + 1} of ${QUESTIONS.length}`;
+
+        if (currentQ >= QUESTIONS.length) {
+          submitResponses();
+          return;
         }
-        // Check if user is already signed in
-        checkAuth();
-      }
-    }
 
-    function updateUrgencyTimer() {
-      const expiresAt = parseInt(subject.expires);
-      const remaining = expiresAt - Date.now();
-      if (remaining <= 0) {
-        clearInterval(urgencyInterval);
-        renderExpired();
-        return;
-      }
-      const hours = Math.floor(remaining / (1000 * 60 * 60));
-      const mins = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60));
-      const secs = Math.floor((remaining % (1000 * 60)) / 1000);
-      const timerEl = document.getElementById('urgency-timer');
-      timerEl.textContent = `${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
-      timerEl.className = 'urgency-timer' + (hours < 2 ? ' critical' : '');
-    }
+        const q = QUESTIONS[currentQ];
+        const isLast = currentQ === QUESTIONS.length - 1;
 
-    async function checkAuth() {
-      const { data: { session } } = await db.auth.getSession();
-      if (session) {
-        currentUser = session.user;
-        showUserBadge();
-        showQuestions();
-      } else {
-        renderSignIn();
-      }
-    }
-
-    function showUserBadge() {
-      const badge = document.getElementById('user-badge');
-      badge.style.display = 'flex';
-      document.getElementById('user-badge-text').textContent =
-        `Responding as ${currentUser.user_metadata?.name || currentUser.email}`;
-    }
-
-    function renderSignIn() {
-      document.getElementById('main-area').innerHTML = `
-        <div class="signin-screen">
-          <span class="signin-icon">🔐</span>
-          <h2 style="margin-bottom:0.5rem;">Sign in to respond</h2>
-          <p class="muted" style="font-size:0.88rem;margin-bottom:1.5rem;line-height:1.6;">
-            Sign in with Google to answer ${subject.name}'s questions.<br>
-            Your identity stays hidden from them — always.
-          </p>
-          <button class="google-btn" onclick="signInWithGoogle()">
-            <svg class="google-icon" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-            </svg>
-            Continue with Google
-          </button>
-          <div class="signin-note">
-            Your name and email are never shown to ${subject.name}.<br>
-            We only use it to prevent duplicate responses.
-          </div>
-        </div>`;
-    }
-
-    async function signInWithGoogle() {
-      const currentUrl = window.location.href;
-      const { error } = await db.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: currentUrl
-        }
-      });
-      if (error) {
-        alert('Sign in failed. Please try again.');
-        console.error(error);
-      }
-    }
-
-    // Handle redirect back from Google
-    db.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        currentUser = session.user;
-        showUserBadge();
-        showQuestions();
-      }
-    });
-
-    function showQuestions() {
-      document.getElementById('progress-bar').style.display = 'block';
-      document.getElementById('progress-label').style.display = 'block';
-      renderQuestion();
-    }
-
-    function renderExpired() {
-      document.getElementById('urgency-banner').style.display = 'none';
-      document.getElementById('subject-card').style.display = 'none';
-      document.getElementById('main-area').innerHTML = `
-        <div class="expired-screen">
-          <span class="expired-icon">⌛</span>
-          <h2 style="margin-bottom:0.5rem;">This link has closed</h2>
-          <p class="muted" style="margin-bottom:0.5rem;">
-            ${subject.name}'s roast window has ended.
-          </p>
-          <p class="muted" style="font-size:0.82rem;margin-bottom:2rem;">
-            They collected their responses and are generating their roast right now.
-          </p>
-          <a href="index.html" class="btn-primary">Create my own profile →</a>
-        </div>`;
-    }
-
-    function renderNotActivated() {
-      document.getElementById('main-area').innerHTML = `
-        <div class="expired-screen">
-          <span class="expired-icon">🔒</span>
-          <h2 style="margin-bottom:0.5rem;">Link not active yet</h2>
-          <p class="muted" style="margin-bottom:2rem;">
-            ${subject.name} hasn't activated their roast window yet.
-            Check back later or create your own profile.
-          </p>
-          <a href="index.html" class="btn-primary">Create my own profile →</a>
-        </div>`;
-    }
-
-    function renderQuestion() {
-      selectedChip = null;
-      imageData = null;
-
-      const pct = (currentQ / QUESTIONS.length) * 100;
-      document.getElementById('progress').style.width = pct + '%';
-      document.getElementById('progress-label').textContent = `Question ${currentQ + 1} of ${QUESTIONS.length}`;
-
-      if (currentQ >= QUESTIONS.length) {
-        submitResponses();
-        return;
-      }
-
-      const q = QUESTIONS[currentQ];
-      const isLast = currentQ === QUESTIONS.length - 1;
-
-      let questionHTML = `
-        <div class="q-transition">
-          <div class="q-type-badge">
-            <div class="q-type-dot"></div>
-            ${q.type === 'image' ? 'Photo roast' : 'Written response'}
-          </div>
-          <div class="card">
-            <h3 style="margin-bottom:1rem;">${q.q}</h3>`;
-
-      if (q.type === 'image') {
-        questionHTML += `
-            <div class="image-roast-zone" id="image-zone" onclick="triggerImageUpload()">
-              <span class="upload-icon">📸</span>
-              <div class="upload-label">
-                Tap to upload a photo of ${subject.name}<br>
-                <span style="color:#333;font-size:0.75rem;">Optional — skip if you don't have one</span>
-              </div>
-              <img id="uploaded-img" src="" alt="" style="display:none;">
-              <button class="image-remove" id="remove-img" onclick="removeImage(event)">✕</button>
+        let html = `
+          <div class="q-transition">
+            <div class="q-type-badge">
+              <div class="q-type-dot"></div>
+              Written response
             </div>
-            <input id="img-file-input" type="file" accept="image/*" style="display:none" onchange="handleImageUpload(event)">`;
+            <div class="card">
+              <h3 style="margin-bottom:1rem;">${q.q}</h3>
+              <p class="muted" style="font-size:0.78rem;margin-bottom:0.6rem;">Quick pick or write your own:</p>
+              <div class="reaction-row">
+                ${q.chips.map(c => `<div class="reaction-chip" onclick="selectChip(this,'${c}')">${c}</div>`).join('')}
+              </div>
+              <textarea id="current-answer" class="nf-input" rows="3"
+                placeholder="${q.placeholder}" style="resize:none;margin-top:0.5rem;"></textarea>
+              <div id="q-error" class="error-msg">Write something — even a few words counts.</div>
+            </div>
+            <button class="btn-primary" onclick="nextQuestion()">
+              ${isLast ? 'Submit anonymously →' : 'Next →'}
+            </button>
+            ${currentQ > 0 ? `<button class="btn-ghost" onclick="prevQuestion()">← Previous</button>` : ''}
+          </div>`;
+
+        document.getElementById('question-area').innerHTML = html;
       }
 
-      if (q.chips && q.chips.length) {
-        questionHTML += `
-            <p class="muted" style="font-size:0.78rem;margin-bottom:0.6rem;">Quick pick or write your own:</p>
-            <div class="reaction-row" id="chip-row">
-              ${q.chips.map(c => `<div class="reaction-chip" onclick="selectChip(this,'${c}')">${c}</div>`).join('')}
-            </div>`;
+      function selectChip(el, value) {
+        document.querySelectorAll('.reaction-chip').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+        selectedChip = value;
+        const ta = document.getElementById('current-answer');
+        if (!ta.value.trim()) ta.value = value;
       }
 
-      questionHTML += `
-            <textarea
-              id="current-answer"
-              class="nf-input"
-              rows="3"
-              placeholder="${q.placeholder}"
-              style="resize:none;margin-top:0.5rem;"
-            ></textarea>
-            <div id="q-error" class="error-msg">Write something — even a few words counts.</div>
-          </div>
-          <button class="btn-primary" onclick="nextQuestion()">
-            ${isLast ? 'Submit anonymously →' : 'Next →'}
-          </button>
-          ${currentQ > 0 ? `<button class="btn-ghost" onclick="prevQuestion()">← Previous</button>` : ''}
-        </div>`;
-
-      document.getElementById('main-area').innerHTML = questionHTML;
-    }
-
-    function selectChip(el, value) {
-      document.querySelectorAll('.reaction-chip').forEach(c => c.classList.remove('selected'));
-      el.classList.add('selected');
-      selectedChip = value;
-      const ta = document.getElementById('current-answer');
-      if (!ta.value.trim()) ta.value = value;
-    }
-
-    function triggerImageUpload() {
-      document.getElementById('img-file-input').click();
-    }
-
-    function handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        imageData = e.target.result;
-        const zone = document.getElementById('image-zone');
-        const img = document.getElementById('uploaded-img');
-        zone.classList.add('has-image');
-        img.src = imageData;
-        img.style.display = 'block';
-        if (zone.querySelector('.upload-icon')) zone.querySelector('.upload-icon').style.display = 'none';
-        if (zone.querySelector('.upload-label')) zone.querySelector('.upload-label').style.display = 'none';
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function removeImage(e) {
-      e.stopPropagation();
-      imageData = null;
-      const zone = document.getElementById('image-zone');
-      zone.classList.remove('has-image');
-      document.getElementById('uploaded-img').style.display = 'none';
-      document.getElementById('uploaded-img').src = '';
-      if (zone.querySelector('.upload-icon')) zone.querySelector('.upload-icon').style.display = 'block';
-      if (zone.querySelector('.upload-label')) zone.querySelector('.upload-label').style.display = 'block';
-    }
-
-    function nextQuestion() {
-      const ta = document.getElementById('current-answer');
-      const err = document.getElementById('q-error');
-      const q = QUESTIONS[currentQ];
-
-      if (q.type === 'image') {
-        answers[currentQ] = {
-          type: 'image',
-          text: ta ? ta.value.trim() || selectedChip || 'No comment' : 'No comment',
-          image: imageData
-        };
+      function nextQuestion() {
+        const ta = document.getElementById('current-answer');
+        const err = document.getElementById('q-error');
+        if (!ta || (ta.value.trim().length < 2 && !selectedChip)) {
+          err.style.display = 'block';
+          ta.style.borderColor = 'var(--red)';
+          setTimeout(() => { err.style.display = 'none'; ta.style.borderColor = ''; }, 2000);
+          return;
+        }
+        answers[currentQ] = { type: 'text', text: ta.value.trim() || selectedChip };
         currentQ++;
         renderQuestion();
-        return;
       }
 
-      if (!ta || (ta.value.trim().length < 2 && !selectedChip)) {
-        err.style.display = 'block';
-        ta.style.borderColor = 'var(--red)';
-        setTimeout(() => {
-          err.style.display = 'none';
-          ta.style.borderColor = '';
-        }, 2000);
-        return;
+      function prevQuestion() {
+        if (currentQ > 0) { currentQ--; renderQuestion(); }
       }
 
-      answers[currentQ] = { type: 'text', text: ta.value.trim() || selectedChip };
-      currentQ++;
-      renderQuestion();
-    }
+      async function submitResponses() {
+        document.getElementById('progress').style.width = '100%';
+        document.getElementById('question-area').innerHTML = `
+          <div style="text-align:center;padding:2rem 0;">
+            <div class="dots" style="justify-content:center;">
+              <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <p class="muted" style="margin-top:1rem;font-size:0.85rem;">Sending your responses...</p>
+          </div>`;
 
-    function prevQuestion() {
-      if (currentQ > 0) { currentQ--; renderQuestion(); }
-    }
+        try {
+          const deviceToken = getDeviceToken();
 
-    async function submitResponses() {
-      document.getElementById('progress').style.width = '100%';
-      document.getElementById('main-area').innerHTML = `
-        <div style="text-align:center;padding:2rem 0;">
-          <div class="dots" style="justify-content:center;">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-          </div>
-          <p class="muted" style="margin-top:1rem;font-size:0.85rem;">Sending your responses...</p>
-        </div>`;
+          // Check for duplicate response
+          const { data: existing } = await db
+            .from('responses')
+            .select('id')
+            .eq('profile_id', subject.id)
+            .eq('device_token', deviceToken)
+            .single();
 
-      try {
-        // Save to Supabase
-        const { error } = await db.from('responses').insert({
-          profile_id: profileId,
-          respondent_email: currentUser?.email || 'anonymous',
-          respondent_name: currentUser?.user_metadata?.name || 'Anonymous',
-          answers: answers
-        });
+          if (existing) {
+            document.getElementById('question-area').innerHTML = `
+              <div class="done-screen">
+                <span class="done-icon">✓</span>
+                <h2 style="margin-bottom:0.5rem;">Already submitted</h2>
+                <p class="muted" style="margin-bottom:2rem;">
+                  You have already responded to ${subject.name}'s roast.
+                  Each person can only respond once.
+                </p>
+                <a href="index.html" class="btn-primary">Create my own profile →</a>
+              </div>`;
+            return;
+          }
 
-        if (!error && profileId) {
-          // Update response count on profile
-          await db.rpc('increment_response_count', { profile_id: profileId });
+          // Save response
+          await db.from('responses').insert({
+            profile_id: subject.id,
+            device_token: deviceToken,
+            respondent_email: 'anonymous',
+            respondent_name: 'Anonymous',
+            answers: answers
+          });
+
+          // Update response count
+          if (subject.id) {
+            await db.rpc('increment_response_count', { profile_id: subject.id });
+          }
+
+        } catch (e) {
+          console.error('Submit error:', e);
         }
 
         clearInterval(urgencyInterval);
         document.getElementById('urgency-banner').style.display = 'none';
-        document.getElementById('main-area').innerHTML = `
+        document.getElementById('question-area').innerHTML = `
           <div class="done-screen">
             <span class="done-icon">✓</span>
             <h2 style="margin-bottom:0.5rem;">Sent anonymously</h2>
-            <p style="margin-bottom:0.5rem;">${subject.name} gets notified when enough people respond.</p>
+            <p style="margin-bottom:0.5rem;">
+              ${subject.name} gets notified when enough people respond.
+            </p>
             <p class="muted" style="font-size:0.82rem;margin-bottom:2rem;">
               They will never know it was you.
             </p>
             <a href="index.html" class="btn-primary">Create my own profile →</a>
-            <a href="respond.html?demo=true" class="btn-ghost" style="margin-top:10px;">Roast someone else</a>
-          </div>`;
-
-      } catch (e) {
-        // Still show success to user even if save fails
-        document.getElementById('main-area').innerHTML = `
-          <div class="done-screen">
-            <span class="done-icon">✓</span>
-            <h2 style="margin-bottom:0.5rem;">Sent anonymously</h2>
-            <p class="muted" style="margin-bottom:2rem;">Your response has been recorded.</p>
-            <a href="index.html" class="btn-primary">Create my own profile →</a>
+            <a href="respond.html?demo=true" class="btn-ghost" style="margin-top:10px;">
+              Roast someone else
+            </a>
           </div>`;
       }
     }

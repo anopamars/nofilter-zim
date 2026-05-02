@@ -385,25 +385,13 @@
     }
 
     function buildShareUrl() {
-      const expires = localStorage.getItem('nfz_expires_at') || '';
       const isLocal = window.location.hostname === '127.0.0.1' ||
                       window.location.hostname === 'localhost';
+      const handle = profile.handle || '';
       const base = isLocal
-        ? `http://127.0.0.1:5500/respond.html`
-        : `https://nofilterzim.netlify.app/respond.html`;
-
-      const params = new URLSearchParams({
-        name: profile.name || '',
-        age: profile.age || '',
-        job: profile.job || '',
-        rel: profile.rel || '',
-        city: profile.city || '',
-        good: profile.good || '',
-        flex: profile.flex || '',
-        expires: expires,
-        id: profileId || ''
-      });
-      return `${base}?${params.toString()}`;
+        ? `http://127.0.0.1:5500/u.html?handle=${handle}`
+        : `https://nofilterzim.vercel.app/u/${handle}`;
+      return base;
     }
 
     function renderTimerSection() {

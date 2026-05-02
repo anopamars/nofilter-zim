@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+</head>
+<body>
+
+  <div style="text-align:center;padding:4rem 0;">
+    <div class="dots" style="justify-content:center;">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <p class="muted" style="margin-top:1rem;font-size:0.85rem;">Loading profile...</p>
+  </div>
+
+  <script>
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function loadProfile() {
+      const path = window.location.pathname;
+      const handle = path.split('/u/')[1];
+
+      if (!handle) {
+        window.location.href = '404.html';
+        return;
+      }
+
+      try {
+        const { data, error } = await db
+          .from('profiles')
+          .select('*')
+          .eq('handle', handle)
+          .single();
+
+        if (error || !data) {
+          window.location.href = '404.html';
+          return;
+        }
+
+        const params = new URLSearchParams({
+          name: data.name || '',
+          age: data.age || '',
+          job: data.job || '',
+          rel: data.rel || '',
+          city: data.city || '',
+          good: data.good || '',
+          flex: data.flex || '',
+          expires: data.expires_at || '',
+          id: data.id || ''
+        });
+
+        window.location.href = `/respond.html?${params.toString()}`;
+
+      } catch (e) {
+        console.error('Profile load error:', e);
+        window.location.href = '404.html';
+      }
+    }
+
+    loadProfile();
+  </script>
+
+</body>
+</html>
