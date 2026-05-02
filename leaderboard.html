@@ -308,31 +308,11 @@
     let currentCity = 'all';
     let leaderboardData = [];
 
-    // Seed data — realistic Zim profiles
-    const SEED_DATA = [
-      { name: 'Tatenda M.', city: 'Harare', job: 'Entrepreneur', responses: 47, score: 8.2, arc: 'Active', initials: 'T' },
-      { name: 'Rudo C.', city: 'Bulawayo', job: 'Content Creator', responses: 38, score: 7.9, arc: 'Active', initials: 'R' },
-      { name: 'Farai N.', city: 'Harare', job: 'Software Dev', responses: 31, score: 7.4, arc: 'Complete', initials: 'F' },
-      { name: 'Blessing K.', city: 'Mutare', job: 'Student', responses: 29, score: 7.1, arc: 'Active', initials: 'B' },
-      { name: 'Tinashe P.', city: 'Gweru', job: 'Nurse', responses: 24, score: 6.8, arc: 'Active', initials: 'T' },
-      { name: 'Chipo S.', city: 'Harare', job: 'Lawyer', responses: 22, score: 6.5, arc: 'Pending', initials: 'C' },
-      { name: 'Munashe D.', city: 'Bulawayo', job: 'Teacher', responses: 19, score: 6.2, arc: 'Active', initials: 'M' },
-      { name: 'Nyasha T.', city: 'Masvingo', job: 'Accountant', responses: 17, score: 5.9, arc: 'Pending', initials: 'N' },
-      { name: 'Simba W.', city: 'Harare', job: 'DJ', responses: 15, score: 5.6, arc: 'Active', initials: 'S' },
-      { name: 'Rutendo M.', city: 'Mutare', job: 'Designer', responses: 12, score: 5.2, arc: 'Pending', initials: 'R' }
-    ];
+    const SEED_DATA = [];
 
     function getLeaderboardData() {
       const stored = localStorage.getItem('nfz_leaderboard');
       let data = stored ? JSON.parse(stored) : [];
-
-      // Merge with seed data — seed entries wont duplicate
-      const names = data.map(d => d.name);
-      SEED_DATA.forEach(s => {
-        if (!names.includes(s.name)) data.push(s);
-      });
-
-      // Sort by score descending
       return data.sort((a, b) => b.score - a.score);
     }
 
@@ -400,9 +380,14 @@
       if (filtered.length === 0) {
         list.innerHTML = `
           <div class="empty-state">
-            <span class="empty-icon">🏙️</span>
-            <div style="font-size:0.9rem;margin-bottom:0.5rem;">No one from ${currentCity} yet</div>
-            <div style="font-size:0.8rem;">Be the first to represent your city</div>
+            <span class="empty-icon">�</span>
+            <div style="font-size:0.9rem;margin-bottom:0.5rem;color:#555;">
+              ${currentCity === 'all' ? 'No one on the leaderboard yet' : 'No one from ' + currentCity + ' yet'}
+            </div>
+            <div style="font-size:0.82rem;color:#333;margin-top:0.5rem;line-height:1.6;">
+              Generate your roast to be the first.<br>
+              Share your link and get responses to earn your score.
+            </div>
           </div>`;
         renderJoinSection(joinSection);
         return;
