@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — No Filter Zim</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .legal-section { margin-bottom: 2rem; }
+    .legal-section p { margin-bottom: 0.75rem; }
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.25rem;
+    }
+    .data-table th {
+      background: var(--red);
+      color: white;
+      padding: 10px 12px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-align: left;
+    }
+    .data-table td {
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      color: #666;
+      border-bottom: 0.5px solid #1a1a1a;
+      vertical-align: top;
+    }
+    .data-table tr:nth-child(even) td { background: #0d0d0d; }
+    .highlight-box {
+      background: #050010;
+      border: 1px solid var(--purple);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .last-updated {
+      font-size: 0.75rem;
+      color: #333;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+
+  <a href="index.html" class="nav-back">← home</a>
+
+  <div class="logo" style="margin-bottom:0.25rem;">
+    no<span style="color:var(--red);">filter</span>
+    <span style="color:#555;font-size:0.9rem;">zim</span>
+  </div>
+  <h2 style="margin-bottom:0.25rem;">Privacy Policy</h2>
+  <div class="last-updated">Last updated: May 2025</div>
+
+  <div class="highlight-box">
+    <div class="section-label" style="color:var(--purple);">The short version</div>
+    <p style="color:#aaa;font-size:0.88rem;line-height:1.7;">
+      We collect only what we need. We never sell your data. Respondent
+      identities are never revealed. You can delete your profile and all
+      associated data at any time.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      1. What Data We Collect
+    </h3>
+    <table class="data-table">
+      <tr>
+        <th>Data</th>
+        <th>Why we collect it</th>
+        <th>Who sees it</th>
+      </tr>
+      <tr>
+        <td>Your name, age, city, job</td>
+        <td>To build your profile and roast card</td>
+        <td>Anyone you share your link with</td>
+      </tr>
+      <tr>
+        <td>Your photo (optional)</td>
+        <td>To display on your profile</td>
+        <td>Anyone you share your link with</td>
+      </tr>
+      <tr>
+        <td>Respondent email address</td>
+        <td>To prevent duplicate responses</td>
+        <td>No Filter Zim only — never the profile owner</td>
+      </tr>
+      <tr>
+        <td>Anonymous responses</td>
+        <td>To generate your AI roast card</td>
+        <td>AI only — never attributed to respondent</td>
+      </tr>
+      <tr>
+        <td>Push notification token</td>
+        <td>To send you response alerts</td>
+        <td>No Filter Zim only</td>
+      </tr>
+      <tr>
+        <td>Roast scores</td>
+        <td>For leaderboard rankings</td>
+        <td>Public leaderboard</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      2. The Anonymity Guarantee
+    </h3>
+    <p class="muted">
+      This is the most important part of our privacy policy. We make one
+      unconditional guarantee: respondent identities are never revealed to
+      profile owners. Not now. Not ever.
+    </p>
+    <p class="muted">
+      We collect respondent email addresses only to prevent the same person
+      from submitting multiple responses. This email is stored securely and
+      is never displayed, shared, or sold to anyone including the profile owner.
+    </p>
+    <p class="muted">
+      Even if a profile owner requests to know who responded, we will not
+      provide this information. Even if compelled by a third party we will
+      notify respondents before disclosing any information where legally
+      permissible.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      3. How We Store Your Data
+    </h3>
+    <p class="muted">
+      All data is stored securely on Supabase, a PostgreSQL database provider
+      with enterprise-grade security. Data is encrypted at rest and in transit.
+      We use Row Level Security policies to ensure users can only access their
+      own data.
+    </p>
+    <p class="muted">
+      Profile photos are stored as base64 encoded strings in our database.
+      We do not use third party image hosting services.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      4. Google Sign In
+    </h3>
+    <p class="muted">
+      Respondents sign in with Google to prevent duplicate responses. We receive
+      your Google email address and display name only. We do not access your
+      Google contacts, calendar, drive, or any other Google data.
+    </p>
+    <p class="muted">
+      Your Google sign in information is used solely for authentication and
+      duplicate prevention. It is never shared with profile owners.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      5. AI Processing
+    </h3>
+    <p class="muted">
+      Anonymous responses are sent to OpenAI's API to generate roast cards and
+      villain arc plans. Responses are sent without any identifying information.
+      OpenAI processes this data according to their own privacy policy. We do
+      not use your data to train AI models.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      6. Your Rights
+    </h3>
+    <p class="muted">You have the right to:</p>
+    <p class="muted">— Delete your profile and all associated data at any time from your profile page</p>
+    <p class="muted">— Request a copy of all data we hold about you</p>
+    <p class="muted">— Correct any inaccurate information on your profile</p>
+    <p class="muted">— Opt out of push notifications at any time in your browser settings</p>
+    <p class="muted">— Request removal from the public leaderboard</p>
+    <p class="muted">
+      To exercise any of these rights contact us at privacy@nofilter.co.zw
+      or use the delete option on your profile page.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      7. Data We Never Collect
+    </h3>
+    <p class="muted">— We never collect payment card details directly (handled by payment processor)</p>
+    <p class="muted">— We never collect your phone number</p>
+    <p class="muted">— We never track your location beyond the city you enter in your profile</p>
+    <p class="muted">— We never sell your data to advertisers or third parties</p>
+    <p class="muted">— We never use your data to train AI models</p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      8. Cookies
+    </h3>
+    <p class="muted">
+      We use localStorage in your browser to store your profile data locally
+      for faster loading. We do not use tracking cookies or third party analytics
+      cookies. We do not use advertising cookies.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      9. Changes to This Policy
+    </h3>
+    <p class="muted">
+      We will notify users of significant changes to this privacy policy via
+      push notification before changes take effect. Continued use of No Filter
+      Zim after changes constitutes acceptance of the updated policy.
+    </p>
+  </div>
+
+  <div class="legal-section">
+    <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:0.75rem;color:var(--white);">
+      10. Contact
+    </h3>
+    <p class="muted">
+      For privacy related requests contact us at:
+      privacy@nofilter.co.zw
+    </p>
+  </div>
+
+  <div class="spacer"></div>
+  <a href="terms.html" class="btn-ghost">Read our Terms of Service →</a>
+  <div class="spacer"></div>
+
+</body>
+</html>

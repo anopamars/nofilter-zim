@@ -6,6 +6,9 @@
   <title>How it works — No Filter Zim</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    body {
+  overflow-y: auto !important;
+}
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--black);
@@ -14,9 +17,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 5rem 1.5rem;
+      padding: 4rem 1.5rem 5rem;
       position: relative;
-      overflow: hidden;
+      overflow-y: auto;
+      max-width: 100%;
     }
     .bg {
       position: fixed;
@@ -83,7 +87,7 @@
       gap: 8px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-bottom: 2.5rem;
+      margin-bottom: 2rem;
     }
     .pill {
       background: #111;
@@ -116,6 +120,7 @@
       text-align: center;
       text-decoration: none;
       transition: transform 0.15s, background 0.15s;
+      margin-bottom: 12px;
     }
     .btn:hover { background: #e02020; transform: translateY(-1px); }
   </style>

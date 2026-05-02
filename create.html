@@ -47,10 +47,7 @@
       display: block;
       margin-bottom: 4px;
     }
-    .photo-btns {
-      display: flex;
-      gap: 10px;
-    }
+    .photo-btns { display: flex; gap: 10px; }
     .photo-btn {
       background: #111;
       border: 0.5px solid #333;
@@ -140,6 +137,103 @@
       margin-bottom: 0.5rem;
     }
     .saving-sub { color: #555; font-size: 0.88rem; }
+
+    /* ROAST MODE */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .mode-card {
+      background: #111;
+      border: 0.5px solid #222;
+      border-radius: 8px;
+      padding: 1.25rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .mode-card.active.fullroast {
+      background: #0a0000;
+      border-color: var(--red);
+    }
+    .mode-card.active.remontada {
+      background: #050010;
+      border-color: var(--purple);
+    }
+    .mode-card:hover { border-color: #444; }
+    .mode-icon { font-size: 2rem; margin-bottom: 0.5rem; display: block; }
+    .mode-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--white);
+      margin-bottom: 0.4rem;
+    }
+    .mode-desc {
+      font-size: 0.75rem;
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 0.75rem;
+    }
+    .mode-badge {
+      display: inline-block;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .mode-badge.red { background: var(--red); color: white; }
+    .mode-badge.purple { background: var(--purple); color: white; }
+
+    /* CONSENT */
+    .consent-box {
+      background: #0d0d0d;
+      border: 0.5px solid #1a1a1a;
+      border-radius: 8px;
+      padding: 0.5rem 0;
+      margin-bottom: 1rem;
+    }
+    .consent-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 1.25rem;
+      border-bottom: 0.5px solid #111;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .consent-item:last-child { border-bottom: none; }
+    .consent-item:hover { background: #111; }
+    .consent-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 4px;
+      background: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: white;
+      flex-shrink: 0;
+      transition: background 0.15s;
+      font-weight: 700;
+    }
+    .consent-check.unchecked {
+      background: #1a1a1a;
+      border: 0.5px solid #333;
+      color: transparent;
+    }
+    .consent-text {
+      font-size: 0.82rem;
+      color: #888;
+      line-height: 1.5;
+      padding-top: 2px;
+    }
   </style>
 </head>
 <body>
@@ -197,7 +291,7 @@
   <div class="input-group">
     <label class="input-label">Your age *</label>
     <input id="inp-age" class="nf-input" type="number"
-      placeholder="e.g. 23" min="13" max="99">
+      placeholder="e.g. 23" min="18" max="99">
   </div>
 
   <div class="input-group">
@@ -291,8 +385,63 @@
     <div class="char-count"><span id="goal-count">0</span>/80</div>
   </div>
 
+  <!-- ROAST MODE -->
+  <div class="form-section-title" style="margin-top:2rem;">Choose your roast mode</div>
+  <p style="color:#555;font-size:0.82rem;margin-bottom:1.25rem;line-height:1.6;">
+    This determines how the AI frames your roast. Choose honestly.
+  </p>
+
+  <div class="mode-grid">
+    <div class="mode-card active fullroast" id="mode-fullroast" onclick="selectMode('fullroast')">
+      <span class="mode-icon">🔥</span>
+      <div class="mode-title">Full Roast</div>
+      <div class="mode-desc">No mercy. No filter. The complete brutal truth about your life choices.</div>
+      <div class="mode-badge red">No Filter</div>
+    </div>
+    <div class="mode-card" id="mode-remontada" onclick="selectMode('remontada')">
+      <span class="mode-icon">⚡</span>
+      <div class="mode-title">Remontada</div>
+      <div class="mode-desc">Roast me but focus on the comeback. I am here to grow not just suffer.</div>
+      <div class="mode-badge purple">Comeback</div>
+    </div>
+  </div>
+
+  <!-- CONSENT -->
+  <div class="form-section-title" style="margin-top:2rem;">Before you continue</div>
+
+  <div class="consent-box">
+    <div class="consent-item" onclick="toggleConsent('c1')">
+      <div class="consent-check" id="c1">✓</div>
+      <div class="consent-text">I confirm I am 18 years or older</div>
+    </div>
+    <div class="consent-item" onclick="toggleConsent('c2')">
+      <div class="consent-check" id="c2">✓</div>
+      <div class="consent-text">I understand responses may be brutally honest and emotionally challenging</div>
+    </div>
+    <div class="consent-item" onclick="toggleConsent('c3')">
+      <div class="consent-check" id="c3">✓</div>
+      <div class="consent-text">I consent to receiving anonymous unfiltered feedback about my life</div>
+    </div>
+    <div class="consent-item" onclick="toggleConsent('c4')">
+      <div class="consent-check" id="c4">✓</div>
+      <div class="consent-text">I will not use this platform to target or harass specific individuals</div>
+    </div>
+    <div class="consent-item" onclick="toggleConsent('c5')">
+      <div class="consent-check" id="c5">✓</div>
+      <div class="consent-text">
+        I have read and agree to the
+        <a href="terms.html" style="color:var(--red);" onclick="event.stopPropagation()">Terms of Service</a>
+        and
+        <a href="privacy.html" style="color:var(--red);" onclick="event.stopPropagation()">Privacy Policy</a>
+      </div>
+    </div>
+  </div>
+
   <div id="form-error" class="error-msg">
     Please fill in all required fields marked with *
+  </div>
+  <div id="consent-error" class="error-msg">
+    Please accept all conditions before continuing.
   </div>
 
   <div class="spacer"></div>
@@ -338,6 +487,8 @@
 
     let photoData = null;
     let stream = null;
+    let selectedMode = 'fullroast';
+    const consents = { c1: true, c2: true, c3: true, c4: true, c5: true };
 
     function updateChar(input, countId) {
       document.getElementById(countId).textContent = input.value.length;
@@ -387,6 +538,25 @@
       document.getElementById('camera-modal').classList.remove('open');
     }
 
+    function selectMode(mode) {
+      selectedMode = mode;
+      const fullCard = document.getElementById('mode-fullroast');
+      const remCard = document.getElementById('mode-remontada');
+      fullCard.className = 'mode-card' + (mode === 'fullroast' ? ' active fullroast' : '');
+      remCard.className = 'mode-card' + (mode === 'remontada' ? ' active remontada' : '');
+    }
+
+    function toggleConsent(id) {
+      consents[id] = !consents[id];
+      const el = document.getElementById(id);
+      el.className = consents[id] ? 'consent-check' : 'consent-check unchecked';
+      el.textContent = consents[id] ? '✓' : '';
+    }
+
+    function allConsentsGiven() {
+      return Object.values(consents).every(v => v === true);
+    }
+
     async function saveProfile() {
       const name = document.getElementById('inp-name').value.trim();
       const age = document.getElementById('inp-age').value.trim();
@@ -399,14 +569,33 @@
       const insecurity = document.getElementById('inp-insecurity').value.trim();
       const goal = document.getElementById('inp-goal').value.trim();
       const err = document.getElementById('form-error');
+      const cerr = document.getElementById('consent-error');
 
+      // Validate required fields
       if (!name || !age || !job || !rel || !city) {
         err.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
-
       err.style.display = 'none';
+
+      // Validate age
+      if (parseInt(age) < 18) {
+        err.style.display = 'block';
+        err.textContent = 'You must be 18 or older to use No Filter Zim.';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+
+      // Validate consents
+      if (!allConsentsGiven()) {
+        cerr.style.display = 'block';
+        cerr.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      cerr.style.display = 'none';
+
+      // Show saving overlay
       document.getElementById('saving-overlay').classList.add('show');
 
       // Generate unique handle
@@ -433,6 +622,7 @@
         goal,
         photo: photoData,
         handle,
+        roast_mode: selectedMode,
         response_count: 0,
         roast_score: 0
       };
@@ -446,11 +636,7 @@
 
         if (error) throw error;
 
-        // Save to localStorage
-        localStorage.setItem('nfz_profile', JSON.stringify({
-          ...profileData,
-          id: data.id
-        }));
+        localStorage.setItem('nfz_profile', JSON.stringify({ ...profileData, id: data.id }));
         localStorage.setItem('nfz_profile_id', data.id);
 
         document.getElementById('saving-overlay').classList.remove('show');
@@ -459,8 +645,6 @@
       } catch (error) {
         console.error('Error saving profile:', error);
         document.getElementById('saving-overlay').classList.remove('show');
-
-        // Fall back to localStorage
         localStorage.setItem('nfz_profile', JSON.stringify(profileData));
         window.location.href = 'profile.html';
       }
