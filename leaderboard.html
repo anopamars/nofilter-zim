@@ -270,7 +270,7 @@
     <button class="refresh-btn" onclick="loadLeaderboard()">↻ Refresh</button>
   </div>
   <p class="muted" style="font-size:0.82rem;margin-bottom:1.5rem;">
-    <span class="live-dot"></span>Most roasted people in Zimbabwe right now
+    <span class="live-dot"></span>Most roasted people in Zimbabwe right now — top 100 profiles
   </p>
 
   <!-- CITY TABS -->
@@ -313,7 +313,12 @@
     function getLeaderboardData() {
       const stored = localStorage.getItem('nfz_leaderboard');
       let data = stored ? JSON.parse(stored) : [];
-      return data.sort((a, b) => b.score - a.score);
+      return data
+        .map(entry => ({
+          ...entry,
+          upvotes: entry.upvotes || 0
+        }))
+        .sort((a, b) => b.score - a.score);
     }
 
     function getMyEntry() {
@@ -364,6 +369,8 @@
         ? leaderboardData
         : leaderboardData.filter(d => d.city === currentCity);
 
+      filtered = filtered.slice(0, 100);
+
       // My rank
       const myEntry = filtered.find(d => d.isMe);
       const myRank = myEntry ? filtered.indexOf(myEntry) + 1 : null;
@@ -406,6 +413,9 @@
           : `<div class="rank-avatar-initials ${isTop ? 'top' : ''}">${entry.initials}</div>`;
 
         const arcColor = entry.arc === 'Active' ? '#9b5fff' : entry.arc === 'Complete' ? '#4a9' : '#555';
+        const statsPill = entry.upvotes
+          ? `<span class="rank-pill">👍 ${entry.upvotes} upvotes</span>`
+          : `<span class="rank-pill">${entry.responses} responses</span>`;
 
         const div = document.createElement('div');
         div.className = `rank-card ${rankClass} ${entry.isMe ? 'is-me' : ''}`;
@@ -416,7 +426,7 @@
             <div class="rank-name">${entry.name}</div>
             <div class="rank-meta">${entry.job} • ${entry.city}</div>
             <div class="rank-pills">
-              <span class="rank-pill">${entry.responses} responses</span>
+              ${statsPill}
               <span class="rank-pill" style="color:${arcColor};">⚡ Arc ${entry.arc}</span>
             </div>
           </div>

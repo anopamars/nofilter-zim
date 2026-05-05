@@ -411,28 +411,10 @@
 
   <div class="consent-box">
     <div class="consent-item" onclick="toggleConsent('c1')">
-      <div class="consent-check" id="c1">✓</div>
-      <div class="consent-text">I confirm I am 18 years or older</div>
-    </div>
-    <div class="consent-item" onclick="toggleConsent('c2')">
-      <div class="consent-check" id="c2">✓</div>
-      <div class="consent-text">I understand responses may be brutally honest and emotionally challenging</div>
-    </div>
-    <div class="consent-item" onclick="toggleConsent('c3')">
-      <div class="consent-check" id="c3">✓</div>
-      <div class="consent-text">I consent to receiving anonymous unfiltered feedback about my life</div>
-    </div>
-    <div class="consent-item" onclick="toggleConsent('c4')">
-      <div class="consent-check" id="c4">✓</div>
-      <div class="consent-text">I will not use this platform to target or harass specific individuals</div>
-    </div>
-    <div class="consent-item" onclick="toggleConsent('c5')">
-      <div class="consent-check" id="c5">✓</div>
+      <div class="consent-check" id="c1"></div>
       <div class="consent-text">
-        I have read and agree to the
-        <a href="terms.html" style="color:var(--red);" onclick="event.stopPropagation()">Terms of Service</a>
-        and
-        <a href="privacy.html" style="color:var(--red);" onclick="event.stopPropagation()">Privacy Policy</a>
+        I confirm I am 18 or older, I understand responses may be anonymous and brutally honest,
+        and I agree to the <a href="privacy.html" style="color:var(--red);" onclick="event.stopPropagation()">Privacy & Terms</a>.
       </div>
     </div>
   </div>
@@ -441,7 +423,7 @@
     Please fill in all required fields marked with *
   </div>
   <div id="consent-error" class="error-msg">
-    Please accept all conditions before continuing.
+    Please accept the consent checkbox before continuing.
   </div>
 
   <div class="spacer"></div>
@@ -488,7 +470,7 @@
     let photoData = null;
     let stream = null;
     let selectedMode = 'fullroast';
-    const consents = { c1: true, c2: true, c3: true, c4: true, c5: true };
+    const consents = { c1: false };
 
     function updateChar(input, countId) {
       document.getElementById(countId).textContent = input.value.length;
