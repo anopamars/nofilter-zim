@@ -1,2 +1,5 @@
 config.js
 supabase.js
+
+# Ignore local frontend dependencies for the sample project
+/cinematic-scroll/node_modules/
